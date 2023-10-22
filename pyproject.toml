@@ -1,0 +1,22 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "JoDBS_Tools"
+version = "0.0.1"
+authors = [
+  { name="JoDotNet", email="" },
+]
+description = "Built for Python 3.11 >="
+readme = "README.md"
+requires-python = ">=3.11.0"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+
+[project.urls]
+"Homepage" = "https://github.com/JoDBS/JoDBS_Tools"
+"Bug Tracker" = "https://github.com/JoDBS/JoDBS_Tools/issues"
