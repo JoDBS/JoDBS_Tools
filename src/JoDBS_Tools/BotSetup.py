@@ -40,15 +40,16 @@ class BotSetup:
             print(f"ERROR: bot.py | Cog Support failed to load. Possible /cogs does not exist?! or Duplicate?! Error: \n{e}")
             raise Exception(e)
 
-    def setup_bot(self):
+    def setup_bot(self, BotNetworkConnection=True):
         try:
             print("==================================================")
-            # Check if bot can connect to BotNetwork
-            status = self.BNC.check_status()
-            if status is None:
-                print("Bot Setup failed to run; BotNetworkConnection failed. Check ENV variables.")
-                return
-            print(status)
+            if BotNetworkConnection:
+                # Check if bot can connect to BotNetwork
+                status = self.BNC.check_status()
+                if status is None:
+                    print("Bot Setup failed to run; BotNetworkConnection failed. Check ENV variables.")
+                    return
+                print(status)
             print("=====BOT=====")
             print("Loading Cogs:")
             self.add_cogs()
