@@ -20,7 +20,7 @@ JoDBS_Tools is a utility library designed to simplify tasks such as connecting t
 Install the package using pip:
 
 ```sh
-pip install JoDBS_Tools
+pip install JoDBS-Tools
 ```
 
 ## Usage
