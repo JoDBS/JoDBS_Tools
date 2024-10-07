@@ -32,5 +32,3 @@ class Permission_Checks:
                 return await func(*args, **kwargs)
             return wrapper
         return decorator
-
-    # Add more static methods for other decorators if needed
