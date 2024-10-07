@@ -6,6 +6,23 @@ class YouTube:
         self.base_url = 'https://www.googleapis.com/youtube/v3'
 
     def get_latest_video(self, channel_id):
+        """
+        Fetches the latest video from a specified YouTube channel.
+        Args:
+            channel_id (str): The ID of the YouTube channel.
+        Returns:
+            dict: A dictionary containing the video ID, title, description, and thumbnails of the latest video if found.
+              Example:
+              {
+                  'video_id': 'abc123',
+                  'title': 'Latest Video Title',
+                  'description': 'Description of the latest video',
+                  'thumbnails': {
+                  'default': {'url': 'https://...'},
+                  'medium': {'url': 'https://...'},
+                  'high': {'url': 'https://...'}
+            None: If no video is found.
+        """
         url = f'{self.base_url}/search'
         params = {
             'part': 'snippet',
@@ -27,7 +44,8 @@ class YouTube:
             return {
                 'video_id': video_id,
                 'title': title,
-                'description': description
+                'description': description,
+                'thumbnails': thumbnails
             }
         else:
             return None
