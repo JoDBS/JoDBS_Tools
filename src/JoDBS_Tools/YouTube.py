@@ -23,6 +23,7 @@ class YouTube:
             video_id = video['id']['videoId']
             title = video['snippet']['title']
             description = video['snippet']['description']
+            thumbnails = video['snippet']['thumbnails']
             return {
                 'video_id': video_id,
                 'title': title,
