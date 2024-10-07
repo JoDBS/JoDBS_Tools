@@ -4,28 +4,40 @@ on:
   push:
     tags:
       - 'v*.*.*'  # Trigger on version tags like v1.0.0, v1.1.0, etc.
+      - 'v*.*.*-dev*'  # Trigger on development version tags like v1.0.0-dev1, v1.1.0-dev2, etc.
 
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
-
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
         python-version: '3.12'  # Specify the Python version
-
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
         pip install build
 
+  publish-stable:
+    needs: build
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v') && !contains(github.ref, '-dev')
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.12'  # Specify the Python version
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install build
     - name: Build package
       run: python -m build
-
     - name: Publish to PyPI
       env:
         TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
@@ -33,3 +45,28 @@ jobs:
       run: |
         python -m pip install twine
         python -m twine upload dist/*
+
+  publish-dev:
+    needs: build
+    runs-on: ubuntu-latest
+    if: contains(github.ref, '-dev')
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.12'  # Specify the Python version
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install build
+    - name: Build package
+      run: python -m build
+    - name: Publish to TestPyPI
+      env:
+        TWINE_USERNAME: ${{ secrets.TEST_PYPI_USERNAME }}
+        TWINE_PASSWORD: ${{ secrets.TEST_PYPI_PASSWORD }}
+      run: |
+        python -m pip install twine
+        python -m twine upload --repository-url https://test.pypi.org/legacy/ dist/*
