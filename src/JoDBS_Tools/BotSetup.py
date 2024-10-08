@@ -57,7 +57,6 @@ class BotSetup:
             self.run_bot()
         except Exception as e:
             print(f"ERROR: bot.py | Bot Setup failed to run; BotNetworkConnection failed, or cogs failed to run. Check ENV variables.")
-            # raise Exception(e)
     
     async def getBotStartupInfo(self):
         # Initiate a BotNetworkConnection to get version.
@@ -78,4 +77,3 @@ class BotSetup:
         activity_name = f"with v{version}"
         activity = Game(name=activity_name)
         await self.bot.change_presence(activity=activity)
-
