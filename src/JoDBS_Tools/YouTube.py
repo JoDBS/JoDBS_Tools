@@ -20,7 +20,9 @@ class YouTube:
                   'thumbnails': {
                   'default': {'url': 'https://...'},
                   'medium': {'url': 'https://...'},
-                  'high': {'url': 'https://...'}
+                  'high': {'url': 'https://...'},
+                  'live_status': {'live, upcoming, or none'},
+                  'raw_data': { ... }
             None: If no video is found.
         """
         url = f'{self.base_url}/search'
@@ -40,12 +42,15 @@ class YouTube:
             video_id = video['id']['videoId']
             title = video['snippet']['title']
             description = video['snippet']['description']
-            thumbnails = video['snippet']['thumbnails']
+            thumbnails = video['snippet']['thumbnails'],
+            live_status = video['snippet']['liveBroadcastContent']
             return {
                 'video_id': video_id,
                 'title': title,
                 'description': description,
-                'thumbnails': thumbnails
+                'thumbnails': thumbnails,
+                'live_status': live_status,
+                'raw_data': data
             }
         else:
             return None
