@@ -91,7 +91,6 @@ class BotNetworkConnection:
                 print("BotNetworkConnection: Invalid scope provided.")
                 return None
         
-        ### TODO: if scope is == "full", then give full data, else try to give .get(scope), if not, return None
 
     def create_data(self, application_id, data):
         url = f"{self.base_url}/data"
