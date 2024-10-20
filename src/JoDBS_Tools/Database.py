@@ -60,25 +60,27 @@ class Database:
             raise Exception("MongoDB Connection: Failed ❌")
 
 class BotNetworkConnection:
-    def __init__(self, base_url=None, api_key=None):
+    def __init__(self, base_url=None, api_key=None, application_id=None):
         self.base_url = base_url or Get_ENV(key="BNC_BASE_URL")
         self.token = api_key or Get_ENV(key="BNC_API_KEY")
+        self.application_id = application_id or Get_ENV(key="APPLICATION_ID")
         self.headers = {
             "x-api-key": self.token,
             "Content-Type": "application/json"
         }
+        self.roles_file = './data/roles.json'
+        self.fetch_and_save_roles()
 
     # Roles
     def fetch_and_save_roles(self):
-        roles = self.get_data(application_id=None, scope="roles")
+        roles = self.get_data(scope="roles")
         save_roles_json(roles, self.roles_file)
 
-
-    def get_data(self, application_id, scope="full"):
-        if application_id is None:
+    def get_data(self, scope="full"):
+        if self.application_id is None:
             raise ValueError("BotNetworkConnection: Application ID is required.")
         
-        url = f"{self.base_url}/data/{application_id}"
+        url = f"{self.base_url}/data/{self.application_id}"
         response = requests.get(url, headers=self.headers)
 
         if scope == "full":
@@ -99,32 +101,28 @@ class BotNetworkConnection:
             except:
                 print("BotNetworkConnection: Invalid scope provided.")
                 return None
-        
 
-    def create_data(self, application_id, data):
+    def create_data(self, data):
         url = f"{self.base_url}/data"
         payload = {
-            "applicationId": application_id,
+            "applicationId": self.application_id,
             "data": data
         }
         response = requests.post(url, headers=self.headers, json=payload)
         return self._handle_response(response)
 
-    def update_data(self, application_id, data):
-        url = f"{self.base_url}/data/{application_id}"
+    def update_data(self, data):
+        url = f"{self.base_url}/data/{self.application_id}"
         payload = {
             "data": data
         }
         response = requests.put(url, headers=self.headers, json=payload)
         return self._handle_response(response)
 
-    def delete_data(self, application_id):
-        url = f"{self.base_url}/data/{application_id}"
+    def delete_data(self):
+        url = f"{self.base_url}/data/{self.application_id}"
         response = requests.delete(url, headers=self.headers)
         return self._handle_response(response)
-
-    # def get_startup_info(self, application_id):
-    #     url = f"{self.base_url}/"
 
     def check_status(self):
         url = f"{self.base_url}/status"
