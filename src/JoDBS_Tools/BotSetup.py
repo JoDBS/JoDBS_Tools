@@ -61,7 +61,7 @@ class BotSetup:
     async def getBotStartupInfo(self):
         # Initiate a BotNetworkConnection to get version.
         BNC = BotNetworkConnection(base_url=Get_ENV("BNC_BASE_URL"), api_key=Get_ENV("BNC_API_KEY"))
-        version = BNC.get_data(application_id=Get_ENV(key="APPLICATION_ID"), scope="version")
+        version = BNC.get_data(scope="version")
 
         launch_time = str(datetime.now())[0:19]
         user = self.bot.user
@@ -72,7 +72,7 @@ class BotSetup:
     async def setBotStatus(self):
         # Initiate a BotNetworkConnection to get version.
         BNC = BotNetworkConnection(base_url=Get_ENV("BNC_BASE_URL"), api_key=Get_ENV("BNC_API_KEY"))
-        version = BNC.get_data(application_id=Get_ENV(key="APPLICATION_ID"), scope="version")
+        version = BNC.get_data(scope="version")
 
         activity_name = f"with v{version}"
         activity = Game(name=activity_name)
