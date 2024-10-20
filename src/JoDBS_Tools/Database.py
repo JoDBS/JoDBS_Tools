@@ -83,6 +83,13 @@ class BotNetworkConnection:
         elif scope == "roles":
             data = self._handle_response(response)
             return data.get('data', {}).get('roles')
+        else:
+            try:
+                data = self._handle_response(response)
+                return data.get('data', {}).get(scope)
+            except:
+                print("BotNetworkConnection: Invalid scope provided.")
+                return None
         
         ### TODO: if scope is == "full", then give full data, else try to give .get(scope), if not, return None
 
