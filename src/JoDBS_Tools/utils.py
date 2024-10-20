@@ -24,6 +24,7 @@ def GetUnixTime_UTC():
     return time_str
 
 # Roles
+# TODO: Refactor to save_json & load_json, 
 def save_roles_json(data, file_path='./data/roles.json'):
     os.makedirs(os.path.dirname(file_path), exist_ok=True)
     with open(file_path, 'w') as json_file:
