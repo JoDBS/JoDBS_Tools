@@ -1,6 +1,6 @@
 import requests
 from pymongo import MongoClient, errors
-from .utils import Get_ENV
+from .utils import Get_ENV, save_roles_json
 
 class Database:
     def __init__(self, connection_string=None, collection=None, database_name=None):
@@ -68,7 +68,16 @@ class BotNetworkConnection:
             "Content-Type": "application/json"
         }
 
+    # Roles
+    def fetch_and_save_roles(self):
+        roles = self.get_data(application_id=None, scope="roles")
+        save_roles_json(roles, self.roles_file)
+
+
     def get_data(self, application_id, scope="full"):
+        if application_id is None:
+            raise ValueError("BotNetworkConnection: Application ID is required.")
+        
         url = f"{self.base_url}/data/{application_id}"
         response = requests.get(url, headers=self.headers)
 
