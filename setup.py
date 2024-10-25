@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='JoDBS_Tools',
-    version='0.2.2-dev5',
+    version='0.2.2-dev6',
     packages=find_packages(where='src'),
     package_dir={'': 'src'},
     install_requires=[
