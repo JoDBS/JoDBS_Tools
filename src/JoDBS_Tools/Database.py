@@ -1,6 +1,6 @@
 import requests
 from pymongo import MongoClient, errors
-from .utils import Get_ENV, save_roles_json
+from .utils import Get_ENV, save_json
 
 class Database:
     def __init__(self, connection_string=None, collection=None, database_name=None):
@@ -75,7 +75,7 @@ class BotNetworkConnection:
     def fetch_and_save_roles(self):
         try:
             roles = self.get_data(scope="roles")
-            save_roles_json(roles, self.roles_file)
+            save_json(roles, self.roles_file)
             return True
         except:
             return None
