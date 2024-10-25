@@ -73,8 +73,12 @@ class BotNetworkConnection:
 
     # Roles
     def fetch_and_save_roles(self):
-        roles = self.get_data(scope="roles")
-        save_roles_json(roles, self.roles_file)
+        try:
+            roles = self.get_data(scope="roles")
+            save_roles_json(roles, self.roles_file)
+            return True
+        except:
+            return None
 
     def get_data(self, scope="full"):
         if self.application_id is None:
