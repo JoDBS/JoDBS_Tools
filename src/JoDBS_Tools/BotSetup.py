@@ -20,6 +20,7 @@ class BotSetup:
             self.bot.run(self.token)
         except Exception as e:
             print("ERROR: bot.py | bot.run() failed to run the bot. Possible wrong token or invalid token?!")
+            print(e)
             raise Exception(e)
 
     def add_cogs(self):
@@ -42,6 +43,7 @@ class BotSetup:
 
     def setup_bot(self, BotNetworkConnection=True):
         try:
+            # TODO: Add some check to tell if botnetworkconnection is false then output a warning to console that some features might not work if cogs rely on BNC functions.
             print("==================================================")
             if BotNetworkConnection:
                 # Check if bot can connect to BotNetwork
