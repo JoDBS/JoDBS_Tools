@@ -50,7 +50,15 @@ class BotSetup:
                     print("Bot Setup failed to run; BotNetworkConnection failed. Check ENV variables.")
                     return
                 print(status)
-            # TODO: Add a role check, try to fetch roles.json, if not found, verbose to console. This makes it so cogs can use utils.load_roles_json() to get roles.
+                
+                # Check if bot can get roles.json from BotNetwork
+                print("Retrieving Roles from BotNetwork:")
+                roles_fetch = self.BNC.fetch_and_save_roles()
+                if roles_fetch:
+                    print("Roles fetched successfully.")
+                else:
+                    print("Roles fetch failed. (some cogs might error out if they rely on roles.json)")
+                    print("Update roles.json in BotNetwork.")
             print("=====BOT=====")
             print("Loading Cogs:")
             self.add_cogs()
