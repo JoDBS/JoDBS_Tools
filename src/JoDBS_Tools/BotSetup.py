@@ -43,7 +43,6 @@ class BotSetup:
 
     def setup_bot(self, BotNetworkConnection=True):
         try:
-            # TODO: Add some check to tell if botnetworkconnection is false then output a warning to console that some features might not work if cogs rely on BNC functions.
             print("==================================================")
             if BotNetworkConnection:
                 # Check if bot can connect to BotNetwork
@@ -61,6 +60,8 @@ class BotSetup:
                 else:
                     print("Roles fetch failed. (some cogs might error out if they rely on roles.json)")
                     print("Update roles.json in BotNetwork.")
+            else:
+                print("BotNetworkConnection is disabled. Some features might not work if cogs rely on BNC functions.")
             print("=====BOT=====")
             print("Loading Cogs:")
             self.add_cogs()
