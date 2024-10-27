@@ -9,10 +9,10 @@ JoDBS_Tools is a utility library designed to simplify tasks such as connecting t
 - **Role-Based Decorators**: Restrict bot commands based on user roles using custom decorators.
 - **API Integration**: Easily connect to external APIs and retrieve data for your applications.
 - **Enhanced Bot Network Integration**: Additional methods for connecting to your Bot Node Network.
+- **YouTube Video Notifier**: Receive notifications for new videos from your favorite YouTubers.
 
 ## Upcoming Features
 
-- **YouTube Video Notifier**: Receive notifications for new videos from your favorite YouTubers.
 - **Asynchronous Functions**: Improved performance with asynchronous functions for bot setup and network connections.
 
 ## Installation
@@ -33,14 +33,12 @@ from nextcord.ext import commands
 from nextcord import Intents
 from JoDBS_Tools import BotSetup
 
-intents = Intents.all()
-
-bot = commands.Bot(intents=intents)
+bot = commands.Bot(intents=Intents.all())
 
 env_path = os.path.join(os.path.dirname(__file__), '.env')
-bot_setup = BotSetup(bot, env_path=env_path)
+bot_setup = BotSetup(bot, env_path=env_path, BotNetConnection=False)
 
 
 if __name__ == "__main__":
-    bot_setup.setup_bot()
+    bot_setup.setup_bot(BotNetConnection=False)
 ```
