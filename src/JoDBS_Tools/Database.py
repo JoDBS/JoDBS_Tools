@@ -81,30 +81,33 @@ class BotNetworkConnection:
             return None
 
     def get_data(self, scope="full"):
-        if self.application_id is None:
-            raise ValueError("BotNetworkConnection: Application ID is required.")
-        
-        url = f"{self.base_url}/data/{self.application_id}"
-        response = requests.get(url, headers=self.headers)
+        try:
+            if self.application_id is None:
+                raise ValueError("BotNetworkConnection: Application ID is required.")
+            
+            url = f"{self.base_url}/data/{self.application_id}"
+            response = requests.get(url, headers=self.headers)
 
-        if scope == "full":
-            return self._handle_response(response)
-        elif scope == "version":
-            data = self._handle_response(response)
-            return data.get('data', {}).get('version')
-        elif scope == "startup_info":
-            data = self._handle_response(response)
-            return data.get('data', {}).get('startup_info')
-        elif scope == "roles":
-            data = self._handle_response(response)
-            return data.get('data', {}).get('roles')
-        else:
-            try:
+            if scope == "full":
+                return self._handle_response(response)
+            elif scope == "version":
                 data = self._handle_response(response)
-                return data.get('data', {}).get(scope)
-            except:
-                print("BotNetworkConnection: Invalid scope provided.")
-                return None
+                return data.get('data', {}).get('version')
+            elif scope == "startup_info":
+                data = self._handle_response(response)
+                return data.get('data', {}).get('startup_info')
+            elif scope == "roles":
+                data = self._handle_response(response)
+                return data.get('data', {}).get('roles')
+            else:
+                try:
+                    data = self._handle_response(response)
+                    return data.get('data', {}).get(scope)
+                except:
+                    print("BotNetworkConnection: Invalid scope provided.")
+                    return None
+        except:
+            return None
 
     def create_data(self, data):
         url = f"{self.base_url}/data"
