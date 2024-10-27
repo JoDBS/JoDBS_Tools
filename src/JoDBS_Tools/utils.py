@@ -16,6 +16,8 @@ def Load_ENV(env_path=None):
     Returns:
     None
     """
+    if env_path is None:
+        return None
     if env_path:
         load_dotenv(dotenv_path=env_path)
     else:

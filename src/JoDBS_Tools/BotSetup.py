@@ -71,21 +71,27 @@ class BotSetup:
             print(f"ERROR: bot.py | Bot Setup failed to run; BotNetworkConnection failed, or cogs failed to run. Check ENV variables.")
     
     async def getBotStartupInfo(self):
-        # Initiate a BotNetworkConnection to get version.
-        BNC = BotNetworkConnection(base_url=Get_ENV("BNC_BASE_URL"), api_key=Get_ENV("BNC_API_KEY"))
-        version = BNC.get_data(scope="version")
+        try:
+            # Initiate a BotNetworkConnection to get version.
+            BNC = BotNetworkConnection(base_url=Get_ENV("BNC_BASE_URL"), api_key=Get_ENV("BNC_API_KEY"))
+            version = BNC.get_data(scope="version")
 
-        launch_time = str(datetime.now())[0:19]
-        user = self.bot.user
+            launch_time = str(datetime.now())[0:19]
+            user = self.bot.user
 
-        launch_message = f"Launched with Version {version} at {launch_time}"+ "\n" + f"Logged in as: {user}" + "\n" + "\n" + "\n"
-        return launch_message
+            launch_message = f"Launched with Version {version} at {launch_time}"+ "\n" + f"Logged in as: {user}" + "\n" + "\n" + "\n"
+            return launch_message
+        except:
+            return "Failed to get Bot Startup Info."
     
     async def setBotStatus(self):
-        # Initiate a BotNetworkConnection to get version.
-        BNC = BotNetworkConnection(base_url=Get_ENV("BNC_BASE_URL"), api_key=Get_ENV("BNC_API_KEY"))
-        version = BNC.get_data(scope="version")
+        try:
+            # Initiate a BotNetworkConnection to get version.
+            BNC = BotNetworkConnection(base_url=Get_ENV("BNC_BASE_URL"), api_key=Get_ENV("BNC_API_KEY"))
+            version = BNC.get_data(scope="version")
 
-        activity_name = f"with v{version}"
-        activity = Game(name=activity_name)
-        await self.bot.change_presence(activity=activity)
+            activity_name = f"with v{version}"
+            activity = Game(name=activity_name)
+            await self.bot.change_presence(activity=activity)
+        except:
+            print("Failed to set Bot Status.")
