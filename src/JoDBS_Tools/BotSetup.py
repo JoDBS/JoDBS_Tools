@@ -5,12 +5,12 @@ from .Database import BotNetworkConnection
 from .utils import Get_ENV, Load_ENV
 
 class BotSetup:
-    def __init__(self, bot, env_path=None):
+    def __init__(self, bot, env_path=None, BNC=True):
         self.bot = bot
         Load_ENV(env_path)  # Ensure environment variables are loaded before accessing them
         self.token = Get_ENV(key="TOKEN")
         self.cogs_directory = "./cogs"
-        self.BNC = BotNetworkConnection()
+        self.BNC = BotNetworkConnection() if BNC else None 
 
     def run_bot(self):
         try:
