@@ -78,7 +78,7 @@ class BotSetup:
         launch_time = str(datetime.now())[0:19]
         user = self.bot.user
 
-        launch_message = f"Launched with Version {version} at {launch_time}"+ "\n" + f"Logged in as: {user}" + "\n" + "\n" + "\n" + "Broadcasts:"
+        launch_message = f"Launched with Version {version} at {launch_time}"+ "\n" + f"Logged in as: {user}" + "\n" + "\n" + "\n"
         return launch_message
     
     async def setBotStatus(self):
