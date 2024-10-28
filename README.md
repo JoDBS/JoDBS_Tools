@@ -14,6 +14,8 @@ JoDBS_Tools is a utility library designed to simplify tasks such as connecting t
 ## Upcoming Features
 
 - **Asynchronous Functions**: Improved performance with asynchronous functions for bot setup and network connections.
+- **Logging Support**: Log all those print statements into a log.txt file instead, no need for endless console spam. Your code runs without issues now, yes?
+- **Extensive Documentation**: Learn how to use a NodeConnection with your Bot. 
 
 ## Installation
 
