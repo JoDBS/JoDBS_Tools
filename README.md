@@ -36,9 +36,9 @@ from JoDBS_Tools import BotSetup
 bot = commands.Bot(intents=Intents.all())
 
 env_path = os.path.join(os.path.dirname(__file__), '.env')
-bot_setup = BotSetup(bot, env_path=env_path, BotNetConnection=False)
+bot_setup = BotSetup(bot, env_path=env_path, NodeConnection=False)
 
 
 if __name__ == "__main__":
-    bot_setup.setup_bot(BotNetConnection=False)
+    bot_setup.setup_bot(NodeConnection=False)
 ```

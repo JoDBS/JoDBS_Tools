@@ -5,12 +5,12 @@ from .Database import BotNetworkConnection
 from .utils import Get_ENV, Load_ENV
 
 class BotSetup:
-    def __init__(self, bot, env_path=None, BotNetConnection=True):
+    def __init__(self, bot, env_path=None, NodeConnection=True):
         self.bot = bot
         Load_ENV(env_path)  # Ensure environment variables are loaded before accessing them
         self.token = Get_ENV(key="TOKEN")
         self.cogs_directory = "./cogs"
-        self.BNC = BotNetworkConnection() if BotNetConnection else None 
+        self.BNC = BotNetworkConnection() if NodeConnection else None 
 
     def run_bot(self):
         try:
@@ -41,10 +41,10 @@ class BotSetup:
             print(f"ERROR: bot.py | Cog Support failed to load. Possible /cogs does not exist?! or Duplicate?! Error: \n{e}")
             raise Exception(e)
 
-    def setup_bot(self, BotNetConnection=True):
+    def setup_bot(self, NodeConnection=True):
         try:
             print("==================================================")
-            if BotNetConnection:
+            if NodeConnection:
                 # Check if bot can connect to BotNetwork
                 status = self.BNC.check_status()
                 if status is None:
