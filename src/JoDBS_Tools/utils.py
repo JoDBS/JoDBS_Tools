@@ -53,7 +53,7 @@ def Get_UnixTimestamp_UTC():
     timestamp = datetime.now(tz=timezone.utc).timestamp()
     return int(timestamp)
 
-def GetUnixTime_UTC():
+def Get_UnixTime_UTC():
     """
     Get the current time in UTC as a string formatted as HH:MM:SS.
 
