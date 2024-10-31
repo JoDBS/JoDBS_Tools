@@ -5,6 +5,15 @@ import functools
 class Permission_Checks:
     @staticmethod
     def has_role(role_id):
+        """
+        A decorator to check if the user has a specific role before executing the command.
+
+        Args:
+            role_id (int): The ID of the role required to execute the command.
+
+        Returns:
+            function: The wrapped function which includes the role check.
+        """
         def decorator(func):
             @functools.wraps(func)
             async def wrapper(*args, **kwargs):
