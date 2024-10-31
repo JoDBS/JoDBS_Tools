@@ -27,7 +27,7 @@ pip install JoDBS-Tools
 
 ## Usage
 
-Run a simple Discord Bot:
+Run a simple Discord Bot (Local Hosted):
 
 ```python
 import os
@@ -44,3 +44,26 @@ bot_setup = BotSetup(bot, env_path=env_path, NodeConnection=False)
 if __name__ == "__main__":
     bot_setup.setup_bot(NodeConnection=False)
 ```
+
+Run Discord Bot with a Node Connection (Cloud Hosted):
+
+```python
+from nextcord.ext import commands
+from nextcord import Intents
+from JoDBS_Tools import BotSetup
+
+bot = commands.Bot(intents=Intents.all())
+
+bot_setup = BotSetup(bot)
+
+
+if __name__ == "__main__":
+    bot_setup.setup_bot()
+```
+
+## Required Environment Variables
+
+- **APPLICATION_ID**: Your application ID.
+- **BNC_API_KEY**: Your BNC API key.
+- **BNC_BASE_URL**: The base URL for the BNC API.
+- **TOKEN**: Your authentication token.
