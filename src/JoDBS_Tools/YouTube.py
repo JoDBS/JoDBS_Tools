@@ -34,23 +34,27 @@ class YouTube:
             'type': 'video',
             'key': self.api_key
         }
-        response = requests.get(url, params=params)
-        response.raise_for_status()
-        data = response.json()
-        if 'items' in data and len(data['items']) > 0:
-            video = data['items'][0]
-            video_id = video['id']['videoId']
-            title = video['snippet']['title']
-            description = video['snippet']['description']
-            thumbnails = video['snippet']['thumbnails'],
-            live_status = video['snippet']['liveBroadcastContent']
-            return {
-                'video_id': video_id,
-                'title': title,
-                'description': description,
-                'thumbnails': thumbnails,
-                'live_status': live_status,
-                'raw_data': data
-            }
-        else:
+        try:
+            response = requests.get(url, params=params)
+            response.raise_for_status()
+            data = response.json()
+            if 'items' in data and len(data['items']) > 0:
+                video = data['items'][0]
+                video_id = video['id']['videoId']
+                title = video['snippet']['title']
+                description = video['snippet']['description']
+                thumbnails = video['snippet']['thumbnails'],
+                live_status = video['snippet']['liveBroadcastContent']
+                return {
+                    'video_id': video_id,
+                    'title': title,
+                    'description': description,
+                    'thumbnails': thumbnails,
+                    'live_status': live_status,
+                    'raw_data': data
+                }
+            else:
+                return None
+        except requests.exceptions.RequestException as e:
+            print(f"Error fetching latest video: {e}")
             return None
