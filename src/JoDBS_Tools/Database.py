@@ -2,7 +2,7 @@ import requests
 from pymongo import MongoClient, errors
 from .utils import Get_ENV, save_json
 
-class Database:
+class MongoClientConnection:
     def __init__(self, connection_string=None, collection=None, database_name=None):
         self.connection_string = connection_string or Get_ENV("CONNECTION_STRING")
         self.collection = collection
