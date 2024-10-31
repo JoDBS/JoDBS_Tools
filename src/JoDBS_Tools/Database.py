@@ -146,7 +146,11 @@ class BotNetworkConnection:
             raise Exception("BotNetworkConnection: Failed ❌")
 
     def _handle_response(self, response):
-        if response.status_code in [200, 201]:
-            return response.json()
-        else:
-            response.raise_for_status()
+        try:
+            if response.status_code in [200, 201]:
+                return response.json()
+            else:
+                response.raise_for_status()
+        except Exception as e:
+            print(f"Error handling response: {e}")
+            return None
