@@ -15,7 +15,8 @@ JoDBS_Tools is a utility library designed to simplify tasks such as connecting t
 
 - **Asynchronous Functions**: Improved performance with asynchronous functions for bot setup and network connections.
 - **Logging Support**: Log all those print statements into a log.txt file instead, no need for endless console spam. Your code runs without issues now, yes?
-- **Extensive Documentation**: Learn how to use a NodeConnection with your Bot. 
+- **Extensive Documentation**: Learn how to use a NodeConnection with your Bot.
+- **Pregenerated Embeds**: Use pre-generated Embeds to keep your Discord Bot code clean and free from repetitive Embed definitions.
 
 ## Installation
 
