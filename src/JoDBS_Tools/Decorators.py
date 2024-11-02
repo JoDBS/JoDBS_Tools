@@ -1,4 +1,4 @@
-import functools
+import functools, traceback
 from nextcord.ext import commands
 from nextcord import Interaction, Member
 from .utils import load_json
@@ -59,5 +59,54 @@ class Permission_Checks:
                         "An error occurred while checking this role based command.",
                         ephemeral=True
                     )
+            return wrapper
+        return decorator
+    
+class Cooldown_Checks:
+    @staticmethod
+    def protected_command(rate, per, bucket_type=commands.BucketType.user):
+        """
+        A decorator to apply cooldown and error handling to a command.
+
+        Args:
+            rate (int): Number of allowed invocations during the cooldown period.
+            per (float): Cooldown period in seconds.
+            bucket_type (commands.BucketType): The type of cooldown bucket.
+
+        Returns:
+            function: The wrapped function which includes cooldown and error handling.
+        """
+        def decorator(func):
+            # Apply the built-in cooldown decorator to the original function
+            func = commands.cooldown(rate, per, bucket_type)(func)
+
+            @functools.wraps(func)
+            async def wrapper(*args, **kwargs):
+                interaction = None
+                for arg in args:
+                    if isinstance(arg, Interaction):
+                        interaction = arg
+                        break
+
+                if interaction is None:
+                    raise TypeError("Interaction object not found in arguments")
+
+                try:
+                    # Execute the command
+                    return await func(*args, **kwargs)
+                except commands.CommandOnCooldown as e:
+                    await interaction.response.send_message(
+                        f"This command is on cooldown. Try again in {round(e.retry_after, 2)} seconds.",
+                        ephemeral=True
+                    )
+                except Exception as e:
+                    # Handle other exceptions
+                    await interaction.response.send_message(
+                        "An error occurred while processing the command.",
+                        ephemeral=True
+                    )
+                    # Log the exception details
+                    print(f"Error in command '{func.__name__}': {e}")
+                    traceback.print_exc()
             return wrapper
         return decorator
