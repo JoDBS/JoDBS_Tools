@@ -56,7 +56,7 @@ class Permission_Checks:
                 except Exception as e:
                     print(f"Error in role check: {e}")
                     await interaction.send(
-                        "An error occurred while checking your role.",
+                        "An error occurred while checking this role based command.",
                         ephemeral=True
                     )
             return wrapper
