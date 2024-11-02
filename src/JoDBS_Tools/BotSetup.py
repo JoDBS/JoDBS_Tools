@@ -89,7 +89,8 @@ class BotSetup:
             # Initiate a BotNetworkConnection to get version.
             BNC = BotNetworkConnection(base_url=Get_ENV("BNC_BASE_URL"), api_key=Get_ENV("BNC_API_KEY"))
             version = BNC.get_data(scope="version")
-
+            if version is None:
+                return
             activity_name = f"with v{version}"
             activity = Game(name=activity_name)
             await self.bot.change_presence(activity=activity)
