@@ -1,15 +1,16 @@
+import functools
 from nextcord.ext import commands
 from nextcord import Interaction, Member
-import functools
+from .utils import load_json
 
 class Permission_Checks:
     @staticmethod
-    def has_role(role_id):
+    def has_role(role_name):
         """
         A decorator to check if the user has a specific role before executing the command.
 
         Args:
-            role_id (int): The ID of the role required to execute the command.
+            role_name (str): The name of the role required to execute the command.
 
         Returns:
             function: The wrapped function which includes the role check.
@@ -28,20 +29,35 @@ class Permission_Checks:
                     raise TypeError("Interaction object not found in arguments")
 
                 try:
+                    roles_data = load_json(file_path="./data/roles.json") or {}
                     if isinstance(interaction.user, Member):
-                        user_roles = [role.id for role in interaction.user.roles]
-                        if int(role_id) not in user_roles:
-                            await interaction.send("You do not have the required role to use this command.", ephemeral=True)
+                        server_id = str(interaction.guild.id)
+                        member_role_ids = [role.id for role in interaction.user.roles]
+                        server_roles = roles_data.get(server_id, {})
+                        required_role_id = server_roles.get(role_name)
+
+                        if required_role_id and int(required_role_id) in member_role_ids:
+                            # User has the required role; proceed with the command
+                            return await func(*args, **kwargs)
+                        else:
+                            await interaction.send(
+                                "You do not have the required role to use this command.",
+                                ephemeral=True
+                            )
                             print(f"[INFO] Missing role for user {interaction.user} in command {interaction.application_command.name}.")
                             return
                     else:
-                        await interaction.send("This command cannot be used in DMs.", ephemeral=True)
+                        await interaction.send(
+                            "This command cannot be used in DMs.",
+                            ephemeral=True
+                        )
                         print(f"[INFO] Command {interaction.application_command.name} attempted in DMs by user {interaction.user}.")
                         return
-
-                    return await func(*args, **kwargs)
                 except Exception as e:
                     print(f"Error in role check: {e}")
-                    await interaction.send("An error occurred while checking your role.", ephemeral=True)
+                    await interaction.send(
+                        "An error occurred while checking your role.",
+                        ephemeral=True
+                    )
             return wrapper
         return decorator
