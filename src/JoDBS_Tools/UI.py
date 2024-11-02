@@ -1,4 +1,5 @@
-from nextcord import Embed, Colour, Member
+from nextcord import Interaction, Member, Embed, Colour, ButtonStyle
+from nextcord.ui import View, Button, button
 from .utils import Get_Datetime_UTC, load_json
 
 class Methods():
@@ -9,6 +10,25 @@ class Methods():
         roles_without_colour = [role for role in member.roles if role.colour != Colour.default()]
         roles_without_colour.sort(key=lambda role: role.position, reverse=True)
         return roles_without_colour[0] if roles_without_colour else None
+
+class ConfirmView(View):
+    def __init__(self, ctx: Interaction, amount: int):
+        super().__init__(timeout=30)
+        self.ctx = ctx
+        self.amount = amount
+        self.value = None
+
+    @button(label="Confirm", style=ButtonStyle.green)
+    async def confirm(self, button: Button, interaction: Interaction):
+        if interaction.user == self.ctx.user:
+            self.value = True
+            self.stop()
+
+    @button(label="Cancel", style=ButtonStyle.red)
+    async def cancel(self, button: Button, interaction: Interaction):
+        if interaction.user == self.ctx.user:
+            self.value = False
+            self.stop()
 
 class GeneralEmbeds():
     def __init__(self, bot):
