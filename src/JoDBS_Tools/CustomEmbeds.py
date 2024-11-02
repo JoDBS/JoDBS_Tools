@@ -19,7 +19,7 @@ class GeneralEmbeds():
 
     async def ping_embed(self, ctx):
         embed = Embed(
-            title="Pong 🏓",
+            title="🏓",
             color=self.default_colour,
             description=f"Latency: {round(self.bot.latency * 1000)}ms"
         )
@@ -51,7 +51,7 @@ class GeneralEmbeds():
         )
         embed.set_thumbnail(url=member.avatar)
         embed.set_footer(text=f"Requested by {ctx.user}")
-        embed.timestamp = Get_Datetime_UTC
+        embed.timestamp = Get_Datetime_UTC()
         embed.add_field(name="Account Created", value=member_account_created.strftime("%Y-%m-%d %H:%M:%S"))
         embed.add_field(name="Member Joined", value=member_account_joined.strftime("%Y-%m-%d %H:%M:%S"))
         embed.add_field(name="Verified", value=is_verified, inline=False)
