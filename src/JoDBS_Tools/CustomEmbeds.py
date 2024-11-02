@@ -12,6 +12,7 @@ class Methods():
 
 class GeneralEmbeds():
     def __init__(self, bot):
+        self.bot = bot
         self.default_colour = Colour.darker_grey()
         self.roles = load_json(file_path="./data/roles.json") or {}
 
