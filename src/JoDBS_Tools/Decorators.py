@@ -77,16 +77,11 @@ class Cooldown_Checks:
             function: The wrapped function which includes cooldown and error handling.
         """
         def decorator(func):
-            # Apply the built-in cooldown decorator to the original function
-            func = commands.cooldown(rate, per, bucket_type)(func)
-
             @functools.wraps(func)
+            @commands.cooldown(rate, per, bucket_type)  # Apply cooldown to the wrapper
             async def wrapper(*args, **kwargs):
-                interaction = None
-                for arg in args:
-                    if isinstance(arg, Interaction):
-                        interaction = arg
-                        break
+                # Extract the Interaction object from arguments
+                interaction = next((arg for arg in args if isinstance(arg, Interaction)), None)
 
                 if interaction is None:
                     raise TypeError("Interaction object not found in arguments")
@@ -95,6 +90,7 @@ class Cooldown_Checks:
                     # Execute the command
                     return await func(*args, **kwargs)
                 except commands.CommandOnCooldown as e:
+                    # Inform the user about the cooldown
                     await interaction.response.send_message(
                         f"This command is on cooldown. Try again in {round(e.retry_after, 2)} seconds.",
                         ephemeral=True
