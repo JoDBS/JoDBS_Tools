@@ -41,6 +41,17 @@ def Get_ENV(key):
     except KeyError:
         raise KeyError(f"Environment variable '{key}' not found.")
 
+def Get_Datetime_UTC():
+    """
+    Get the current datetime in UTC.
+
+    This function returns the current time as a datetime object in Coordinated Universal Time (UTC).
+
+    Returns:
+        datetime: The current datetime in UTC.
+    """
+    return datetime.now(tz=timezone.utc)
+
 def Get_UnixTimestamp_UTC():
     """
     Get the current Unix timestamp in UTC.
