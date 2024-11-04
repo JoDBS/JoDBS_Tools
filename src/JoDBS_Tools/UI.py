@@ -1,15 +1,6 @@
 from nextcord import Interaction, Member, Embed, Colour, ButtonStyle
 from nextcord.ui import View, Button, button
-from .utils import Get_Datetime_UTC, load_json
-
-class Methods():
-    def __init__(self):
-        pass
-
-    async def get_highest_role_without_color(self, member: Member):
-        roles_without_colour = [role for role in member.roles if role.colour != Colour.default()]
-        roles_without_colour.sort(key=lambda role: role.position, reverse=True)
-        return roles_without_colour[0] if roles_without_colour else None
+from .utils import Get_Datetime_UTC, load_json, get_highest_role_without_color
 
 class ConfirmView(View):
     def __init__(self, ctx: Interaction, amount: int):
@@ -61,7 +52,7 @@ class GeneralEmbeds():
         member_account_joined = ctx.guild.get_member(member_id).joined_at
         is_verified = "🟢" if verified_role_id in member_role_ids else "🔴"
         is_staff_member = "🟢" if staff_member_role_id in member_role_ids else "🔴"
-        member_highest_role = await Methods().get_highest_role_without_color(member)
+        member_highest_role = await get_highest_role_without_color(member)
 
 
         embed = Embed(
