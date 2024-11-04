@@ -7,10 +7,11 @@ from .utils import Get_ENV, Load_ENV
 class BotSetup:
     def __init__(self, bot, env_path=None, NodeConnection=True):
         self.bot = bot
+        self.NodeConnection = NodeConnection
         Load_ENV(env_path)  # Ensure environment variables are loaded before accessing them
         self.token = Get_ENV(key="TOKEN")
         self.cogs_directory = "./cogs"
-        self.BNC = BotNetworkConnection() if NodeConnection else None 
+        self.BNC = BotNetworkConnection() if self.NodeConnection else None 
 
     def run_bot(self):
         try:
@@ -41,10 +42,10 @@ class BotSetup:
             print(f"ERROR: bot.py | Cog Support failed to load. Possible /cogs does not exist?! or Duplicate?! Error: \n{e}")
             raise Exception(e)
 
-    def setup_bot(self, NodeConnection=True):
+    def setup_bot(self):
         try:
             print("==================================================")
-            if NodeConnection:
+            if self.NodeConnection:
                 # Check if bot can connect to BotNetwork
                 status = self.BNC.check_status()
                 if status is None:
@@ -73,8 +74,11 @@ class BotSetup:
     async def getBotStartupInfo(self):
         try:
             # Initiate a BotNetworkConnection to get version.
-            BNC = BotNetworkConnection(base_url=Get_ENV("BNC_BASE_URL"), api_key=Get_ENV("BNC_API_KEY"))
-            version = BNC.get_data(scope="version")
+            if self.NodeConnection:
+                BNC = BotNetworkConnection(base_url=Get_ENV("BNC_BASE_URL"), api_key=Get_ENV("BNC_API_KEY"))
+                version = BNC.get_data(scope="version")
+            else:
+                version = "N/A"
 
             launch_time = str(datetime.now())[0:19]
             user = self.bot.user
@@ -86,15 +90,19 @@ class BotSetup:
     
     async def setBotStatus(self):
         try:
-            # Initiate a BotNetworkConnection to get version.
-            BNC = BotNetworkConnection(base_url=Get_ENV("BNC_BASE_URL"), api_key=Get_ENV("BNC_API_KEY"))
-            version = BNC.get_data(scope="version")
-            if version is None:
+            if self.NodeConnection:
+                # Initiate a BotNetworkConnection to get version.
+                BNC = BotNetworkConnection(base_url=Get_ENV("BNC_BASE_URL"), api_key=Get_ENV("BNC_API_KEY"))
+                version = BNC.get_data(scope="version")
+                if version is None:
+                    return False
+                activity_name = f"with v{version}"
+                activity = Game(name=activity_name)
+                await self.bot.change_presence(activity=activity)
+                return True
+            else:
+                print("BotNetworkConnection is disabled. Bot Status will not be set.")
                 return False
-            activity_name = f"with v{version}"
-            activity = Game(name=activity_name)
-            await self.bot.change_presence(activity=activity)
-            return True
         except:
             print("Failed to set Bot Status.")
             return False
