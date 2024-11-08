@@ -57,13 +57,12 @@ class GeneralEmbeds():
         embed.set_footer(text=f"Requested by {ctx.user}")
         embed.timestamp = Get_Datetime_UTC()
         embed.add_field(name="Owner", value=server_owner.mention)
-        embed.add_field(name="Region", value=server_region)
         embed.add_field(name="Server Created", value=server_created.strftime("%Y-%m-%d %H:%M:%S"))
         embed.add_field(name="Member Count", value=f"{server_member_count} Members")
         embed.add_field(name="Online Members", value=f"{server_online_members} Members")
-        embed.add_field(name="Roles", value=f"{len(server.roles)} Roles")
         embed.add_field(name="Channels", value=f"{len(server.channels)} Channels")
         embed.add_field(name="Categories", value=f"{len(server.categories)} Categories")
+        embed.add_field(name="Roles", value=f"{server.roles} Roles")
         embed.add_field(name="BNC Roles.json", value=self.roles.get(str(server_id), "No Roles.json Data"))
         
         return embed
