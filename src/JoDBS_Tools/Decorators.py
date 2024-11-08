@@ -1,4 +1,4 @@
-import functools, traceback
+import functools
 from nextcord.ext import commands
 from nextcord import Interaction, Member
 from .utils import load_json
