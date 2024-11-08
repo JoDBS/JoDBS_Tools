@@ -38,6 +38,36 @@ class GeneralEmbeds():
         embed.timestamp = Get_Datetime_UTC()
         return embed
     
+    async def server_info_embed(self, ctx):
+        server = ctx.guild
+        server_id = server.id
+        server_name = server.name
+        server_owner = server.owner
+        server_region = server.region
+        server_created = server.created_at
+        server_member_count = server.member_count
+        server_online_members = len([member for member in server.members if member.status != "offline"])
+        server_icon = server.icon
+
+        embed = Embed(
+            title=f"Server Information for {server_name} ({server_id})",
+            color=self.default_colour
+        )
+        embed.set_thumbnail(url=server_icon)
+        embed.set_footer(text=f"Requested by {ctx.user}")
+        embed.timestamp = Get_Datetime_UTC()
+        embed.add_field(name="Owner", value=server_owner.mention)
+        embed.add_field(name="Region", value=server_region)
+        embed.add_field(name="Server Created", value=server_created.strftime("%Y-%m-%d %H:%M:%S"))
+        embed.add_field(name="Member Count", value=f"{server_member_count} Members")
+        embed.add_field(name="Online Members", value=f"{server_online_members} Members")
+        embed.add_field(name="Roles", value=f"{len(server.roles)} Roles")
+        embed.add_field(name="Channels", value=f"{len(server.channels)} Channels")
+        embed.add_field(name="Categories", value=f"{len(server.categories)} Categories")
+        embed.add_field(name="BNC Roles.json", value=self.roles.get(str(server_id), "No Roles.json Data"))
+        
+        return embed
+    
     async def user_info_embed(self, ctx, member):
         # add docstring
         server_id = str(ctx.guild.id)
