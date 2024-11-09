@@ -79,7 +79,7 @@ class GeneralEmbeds():
         member_id = member.id
         member_account_created = ctx.guild.get_member(member_id).created_at
         member_account_joined = ctx.guild.get_member(member_id).joined_at
-        member_status = member.status
+        member_status = "🟢" if not member.status == "offline" else "🔴"
         is_verified = "🟢" if verified_role_id in member_role_ids else "🔴"
         is_staff_member = "🟢" if staff_member_role_id in member_role_ids else "🔴"
         member_highest_role = await get_highest_role_without_color(member)
