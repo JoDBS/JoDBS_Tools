@@ -58,12 +58,12 @@ class GeneralEmbeds():
         embed.timestamp = Get_Datetime_UTC()
         embed.add_field(name="Owner", value=server_owner.mention)
         embed.add_field(name="Server Created", value=server_created.strftime("%Y-%m-%d %H:%M:%S"))
-        embed.add_field(name="Member Count", value=f"{server_member_count} Members")
-        embed.add_field(name="Online Members", value=f"{server_online_members} Members")
         embed.add_field(name="Channels", value=f"{len(server.channels)} Channels")
         embed.add_field(name="Categories", value=f"{len(server.categories)} Categories")
-        embed.add_field(name="Roles", value=f"{server.roles} Roles")
-        embed.add_field(name="BNC Roles.json", value=self.roles.get(str(server_id), "No Roles.json Data"))
+        embed.add_field(name="Member Count", value=f"{server_member_count} Members")
+        embed.add_field(name="Online Members", value=f"{server_online_members} Members")
+        embed.add_field(name="Roles", value=f"{server.roles} Roles", inline=False)
+        embed.add_field(name="BNC Roles.json", value=self.roles.get(str(server_id), "No Roles.json Data"), inline=False)
         
         return embed
     
@@ -79,6 +79,7 @@ class GeneralEmbeds():
         member_id = member.id
         member_account_created = ctx.guild.get_member(member_id).created_at
         member_account_joined = ctx.guild.get_member(member_id).joined_at
+        member_status = member.status
         is_verified = "🟢" if verified_role_id in member_role_ids else "🔴"
         is_staff_member = "🟢" if staff_member_role_id in member_role_ids else "🔴"
         member_highest_role = await get_highest_role_without_color(member)
@@ -94,6 +95,7 @@ class GeneralEmbeds():
         embed.timestamp = Get_Datetime_UTC()
         embed.add_field(name="Account Created", value=member_account_created.strftime("%Y-%m-%d %H:%M:%S"))
         embed.add_field(name="Member Joined", value=member_account_joined.strftime("%Y-%m-%d %H:%M:%S"))
+        embed.add_field(name="Online Status", value=member_status)
         embed.add_field(name="Verified", value=is_verified, inline=False)
         embed.add_field(name="Staff Member", value=is_staff_member, inline=False)
         embed.add_field(name="Highest Role", value=member_highest_role.mention if member_highest_role else "None", inline=False)
