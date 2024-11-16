@@ -58,6 +58,60 @@ class Permission_Checks:
                     )
             return wrapper
         return decorator
+    
+    @staticmethod
+    def has_any_roles(role_names):
+        """
+        A decorator to check if the user has any of the specified roles.
+
+        Args:
+            role_names (list/tuple): List of role names to check against.
+
+        Returns:
+            function: The wrapped function which includes the role check.
+        """
+        def decorator(func):
+            @functools.wraps(func)
+            async def wrapper(*args, **kwargs):
+                interaction = next((arg for arg in args if isinstance(arg, Interaction)), None)
+                
+                if interaction is None:
+                    raise TypeError("Interaction object not found in arguments")
+
+                try:
+                    roles_data = load_json(file_path="./data/roles.json") or {}
+                    if isinstance(interaction.user, Member):
+                        server_id = str(interaction.guild.id)
+                        member_role_ids = [role.id for role in interaction.user.roles]
+                        server_roles = roles_data.get(server_id, {})
+                        
+                        # Check if user has any of the required roles
+                        for role_name in role_names:
+                            required_role_id = server_roles.get(role_name)
+                            if required_role_id and int(required_role_id) in member_role_ids:
+                                return await func(*args, **kwargs)
+                        
+                        await interaction.send(
+                            f"You need one of these roles to use this command: {', '.join(role_names)}",
+                            ephemeral=True
+                        )
+                        print(f"[INFO] Missing roles for user {interaction.user} in command {interaction.application_command.name}.")
+                        return
+                    else:
+                        await interaction.send(
+                            "This command cannot be used in DMs.",
+                            ephemeral=True
+                        )
+                        print(f"[INFO] Command {interaction.application_command.name} attempted in DMs by user {interaction.user}.")
+                        return
+                except Exception as e:
+                    print(f"Error in role check: {e}")
+                    await interaction.send(
+                        "An error occurred while checking this role based command.",
+                        ephemeral=True
+                    )
+            return wrapper
+        return decorator
 
 class Cooldown_Checks:
     _cooldowns = {}
