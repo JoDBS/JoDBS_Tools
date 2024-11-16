@@ -111,7 +111,7 @@ class LoadEmbed:
     https://discord.com/developers/docs/resources/message#embed-object
     """
     def __init__(self, guild_id):
-        self.guild_id = guild_id
+        self.guild_id = str(guild_id)
         self.embeds = load_json(file_path="./data/embeds.json") or {}
         print("Loaded embeds.json", self.embeds)
 
