@@ -1,5 +1,5 @@
-from nextcord import Interaction, Member, Embed, Colour, ButtonStyle
-from nextcord.ui import View, Button, button
+from nextcord import Interaction, Member, Embed, Colour, ButtonStyle, SelectOption
+from nextcord.ui import View, Button, button, Select
 from .utils import Get_Datetime_UTC, load_json, get_highest_role_without_color
 
 class ConfirmView(View):
@@ -107,26 +107,72 @@ class GeneralEmbeds:
 
 
 class LoadEmbed:
-    """
-    https://discord.com/developers/docs/resources/message#embed-object
-    """
     def __init__(self, guild_id):
         self.guild_id = str(guild_id)
         self.embeds = load_json(file_path="./data/embeds.json") or {}
-        print("Loaded embeds.json", self.embeds)
+        # print("Loaded embeds.json", self.embeds)
 
     async def return_embed(self, name: str):
-        # Attempt to get the embed from locally stored Embeds.json
+        # Attempt to get the embed from locally stored embeds.json
         try:
             embed_data = self.embeds.get(self.guild_id, {}).get(name)
-            print("embed_data:", embed_data)
             if not embed_data:
-                return None
-            embed = Embed.from_dict(embed_data)
-            return embed
+                return None, None
+
+            # Create the Embed object
+            embed_dict = {k: v for k, v in embed_data.items() if k != "view"}
+            embed = Embed.from_dict(embed_dict)
+
+            # Check for associated view
+            view_data = embed_data.get("view")
+            if view_data:
+                view = await self.create_view(view_data)
+            else:
+                view = None
+
+            return embed, view
         except Exception as e:
             print(f"Error: {e}")
-            return None
+            return None, None
+
+    async def create_view(self, view_data: dict):
+        view = View(timeout=None)  # Set timeout to None for persistent components
+        
+        # Handle buttons
+        buttons = view_data.get("buttons", [])
+        for button_data in buttons:
+            button = Button(
+                label=button_data.get("label", "Button"),
+                style=getattr(ButtonStyle, button_data.get("style", "secondary")),
+                custom_id=button_data.get("custom_id"),  # Ensure custom_id is set
+                url=button_data.get("url"),
+                emoji=button_data.get("emoji"),
+                disabled=button_data.get("disabled", False)
+            )
+            view.add_item(button)
+        
+        # Handle select menus
+        selects = view_data.get("selects", [])
+        for select_data in selects:
+            options = [
+                SelectOption(
+                    label=option.get("label"),
+                    value=option.get("value"),
+                    description=option.get("description"),
+                    emoji=option.get("emoji")
+                )
+                for option in select_data.get("options", [])
+            ]
+            select_menu = Select(
+                placeholder=select_data.get("placeholder", "Choose an option"),
+                min_values=select_data.get("min_values", 1),
+                max_values=select_data.get("max_values", 1),
+                options=options,
+                custom_id=select_data.get("custom_id")  # Ensure custom_id is set
+            )
+            view.add_item(select_menu)
+        
+        return view
 
 
 
