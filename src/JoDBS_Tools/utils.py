@@ -39,7 +39,7 @@ def Get_ENV(key):
     try:
         return os.environ[key]
     except KeyError:
-        raise KeyError(f"Environment variable '{key}' not found.")
+        return None
 
 def Get_Datetime_UTC():
     """
