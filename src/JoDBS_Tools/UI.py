@@ -13,12 +13,14 @@ class ConfirmView(View):
     async def confirm(self, button: Button, interaction: Interaction):
         if interaction.user == self.ctx.user:
             self.value = True
+            button.disabled = True
             self.stop()
 
     @button(label="Cancel", style=ButtonStyle.red)
     async def cancel(self, button: Button, interaction: Interaction):
         if interaction.user == self.ctx.user:
             self.value = False
+            button.disabled = True
             self.stop()
 
 class GeneralEmbeds():
@@ -43,7 +45,6 @@ class GeneralEmbeds():
         server_id = server.id
         server_name = server.name
         server_owner = server.owner
-        server_region = server.region
         server_created = server.created_at
         server_member_count = server.member_count
         server_online_members = len([member for member in server.members if member.status != "offline"])
