@@ -25,7 +25,7 @@ class ConfirmView(View):
             await interaction.response.edit_message(content=f"Cancelled {self.amount}!", view=self)
             self.stop()
 
-class GeneralEmbeds():
+class GeneralEmbeds:
     def __init__(self, bot):
         self.bot = bot
         self.default_colour = Colour.darker_grey()
@@ -104,6 +104,29 @@ class GeneralEmbeds():
         embed.add_field(name="Highest Role", value=member_highest_role.mention if member_highest_role else "None", inline=False)
 
         return embed
+
+
+class LoadEmbed:
+    """
+    https://discord.com/developers/docs/resources/message#embed-object
+    """
+    def __init__(self, bot, ctx, guild_id):
+        self.bot = bot
+        self.ctx = ctx
+        self.guild_id = guild_id
+        self.embeds = load_json(file_path="./data/embeds.json") or {}
+
+    async def return_embed(self, name: str):
+        # Attempt to get the embed from locally stored Embeds.json
+        try:
+            embed_data = self.embeds.get(self.guild_id, {}).get(name)
+            if not embed_data:
+                return None
+            embed = Embed.from_dict(embed_data)
+            return embed
+        except Exception as e:
+            print(f"Error: {e}")
+            return None
 
 
 
