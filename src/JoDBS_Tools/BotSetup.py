@@ -2,13 +2,13 @@ import os
 from datetime import datetime
 from nextcord import Game
 from .Database import BotNetworkConnection
-from .utils import Get_ENV, Load_ENV
+from .utils import Get_ENV, Load_ENV, Get_ENV_Bool
 
 class BotSetup:
     def __init__(self, bot, env_path=None, NodeConnection=True):
         self.bot = bot
         Load_ENV(env_path)  # Ensure environment variables are loaded before accessing them
-        self.NodeConnection = Get_ENV("NODE_CONNECTION") or NodeConnection        
+        self.NodeConnection = Get_ENV_Bool("NODE_CONNECTION", NodeConnection)
         self.token = Get_ENV(key="TOKEN")
         self.cogs_directory = "./cogs"
         self.BNC = BotNetworkConnection() if self.NodeConnection else None 

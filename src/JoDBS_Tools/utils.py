@@ -39,7 +39,29 @@ def Get_ENV(key):
     try:
         return os.environ[key]
     except KeyError:
-        return None
+        raise KeyError(f"Environment variable '{key}' not found.")
+
+def Get_ENV_Bool(key, default=None):
+    """
+    Retrieve the value of an environment variable as a boolean.
+
+    Args:
+        key (str): The name of the environment variable to retrieve.
+        default (bool, optional): The default value to return if the environment variable is not found. Defaults to None.
+
+    Returns:
+        bool: The value of the environment variable as a boolean.
+
+    Raises:
+        KeyError: If the environment variable is not found
+    """
+    try:
+        value = Get_ENV(key)
+        if value is None:
+            return default
+        return str(value).lower() == "true"
+    except KeyError:
+        raise KeyError(f"Environment variable '{key}' not found.")
 
 def Get_Datetime_UTC():
     """
