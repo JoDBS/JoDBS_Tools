@@ -110,16 +110,16 @@ class LoadEmbed:
     """
     https://discord.com/developers/docs/resources/message#embed-object
     """
-    def __init__(self, bot, ctx, guild_id):
-        self.bot = bot
-        self.ctx = ctx
+    def __init__(self, guild_id):
         self.guild_id = guild_id
         self.embeds = load_json(file_path="./data/embeds.json") or {}
+        print("Loaded embeds.json", self.embeds)
 
     async def return_embed(self, name: str):
         # Attempt to get the embed from locally stored Embeds.json
         try:
             embed_data = self.embeds.get(self.guild_id, {}).get(name)
+            print("embed_data:", embed_data)
             if not embed_data:
                 return None
             embed = Embed.from_dict(embed_data)
