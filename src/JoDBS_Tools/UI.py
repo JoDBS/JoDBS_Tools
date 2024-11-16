@@ -14,6 +14,7 @@ class ConfirmView(View):
         if interaction.user == self.ctx.user:
             self.value = True
             button.disabled = True
+            interaction.response.edit_message(content=f"Confirmed {self.amount}!", view=self)
             self.stop()
 
     @button(label="Cancel", style=ButtonStyle.red)
@@ -21,6 +22,7 @@ class ConfirmView(View):
         if interaction.user == self.ctx.user:
             self.value = False
             button.disabled = True
+            interaction.response.edit_message(content=f"Cancelled {self.amount}!", view=self)
             self.stop()
 
 class GeneralEmbeds():
