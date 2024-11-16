@@ -7,8 +7,8 @@ from .utils import Get_ENV, Load_ENV
 class BotSetup:
     def __init__(self, bot, env_path=None, NodeConnection=True):
         self.bot = bot
-        self.NodeConnection = Get_ENV("NODE_CONNECTION") if Get_ENV("NODE_CONNECTION") is not None else NodeConnection
         Load_ENV(env_path)  # Ensure environment variables are loaded before accessing them
+        self.NodeConnection = Get_ENV("NODE_CONNECTION") or NodeConnection        
         self.token = Get_ENV(key="TOKEN")
         self.cogs_directory = "./cogs"
         self.BNC = BotNetworkConnection() if self.NodeConnection else None 
