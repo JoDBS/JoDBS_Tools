@@ -49,7 +49,7 @@ class BotSetup:
                 # Check if bot can connect to BotNetwork
                 status = self.BNC.check_status()
                 if status is None:
-                    print("Bot Setup failed to run; BotNetworkConnection failed. Check ENV variables.")
+                    print("Bot Setup failed to run;\n BotNetworkConnection failed. Check ENV variables.")
                     return
                 print(status)
                 
@@ -62,7 +62,7 @@ class BotSetup:
                     print("Roles fetch failed. (some cogs might error out if they rely on roles.json)")
                     print("Update roles.json in BotNetwork.")
             else:
-                print("BotNetworkConnection is disabled. Some features might not work if cogs rely on BNC functions.")
+                print("BotNetworkConnection is disabled.\n Some features might not work if cogs rely on BNC functions.")
             print("=====BOT=====")
             print("Loading Cogs:")
             self.add_cogs()
@@ -101,7 +101,7 @@ class BotSetup:
                 await self.bot.change_presence(activity=activity)
                 return True
             else:
-                print("BotNetworkConnection is disabled. Bot Status will not be set.")
+                print("BotNetworkConnection is disabled.\n Bot Status will not be set.")
                 return False
         except:
             print("Failed to set Bot Status.")
