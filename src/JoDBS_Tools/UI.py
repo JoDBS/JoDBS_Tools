@@ -109,23 +109,87 @@ class GeneralEmbeds:
 class LoadEmbed:
     def __init__(self, guild_id):
         self.guild_id = str(guild_id)
-        self.embeds = load_json(file_path="./data/embeds.json") or {}
-        # print("Loaded embeds.json", self.embeds)
+        
+        # Example data structure
+        self.embeds = {
+            "1150069659404603516": {  # guild_id
+                "rules": {
+                    "embed": {
+                        "title": "Server Rules",
+                        "description": "Please follow these rules",
+                        "color": 0x36393F,
+                        "fields": [
+                            {"name": "Rule 1", "value": "Be respectful", "inline": False}
+                        ]
+                    },
+                    "components": {
+                        "type": "button",
+                        "items": [
+                            {
+                                "label": "Accept Rules",
+                                "style": ButtonStyle.green,
+                                "custom_id": "accept_rules"
+                            }
+                        ]
+                    }
+                },
+                "roles": {
+                    "embed": {
+                        "title": "Server Roles",
+                        "description": "Choose your roles below"
+                    },
+                    "components": {
+                        "type": "select",
+                        "items": [
+                            {
+                                "label": "Gaming",
+                                "value": "gaming_role",
+                                "description": "Access to gaming channels"
+                            }
+                        ]
+                    }
+                }
+            }
+        }
 
     async def return_embed(self, name: str):
-        # Attempt to get the embed from locally stored embeds.json
         try:
-            embed_data = self.embeds.get(self.guild_id, {}).get(name)
+            guild_data = self.embeds.get(self.guild_id, {})
+            embed_data = guild_data.get(name, {}).get("embed")
             if not embed_data:
                 return None
-
-            # Create the Embed object
-            embed = Embed.from_dict(embed_data)
-
-            return embed
-        
+            return Embed.from_dict(embed_data)
         except Exception as e:
-            print(f"Error: {e}")
+            print(f"Error loading embed: {e}")
+            return None
+
+    async def return_components(self, name: str) -> View:
+        try:
+            guild_data = self.embeds.get(self.guild_id, {})
+            component_data = guild_data.get(name, {}).get("components")
+            if not component_data:
+                return None
+
+            view = View(timeout=180)
+            
+            if component_data["type"] == "button":
+                for item in component_data["items"]:
+                    button = Button(
+                        label=item["label"],
+                        style=item["style"],
+                        custom_id=item.get("custom_id")
+                    )
+                    view.add_item(button)
+
+            elif component_data["type"] == "select":
+                options = [SelectOption(**item) for item in component_data["items"]]
+                select = Select(options=options, custom_id=f"{name}_select")
+                view.add_item(select)
+
+            return view
+
+        except Exception as e:
+            print(f"Error loading components: {e}")
             return None
 
 
