@@ -1,3 +1,4 @@
+import nextcord
 from nextcord import Interaction, Member, Embed, Colour, ButtonStyle, SelectOption
 from nextcord.ui import View, Button, button, Select
 from .utils import Get_Datetime_UTC, load_json, get_highest_role_without_color
@@ -156,16 +157,23 @@ class UIFetcher:
                     await self.execute_action(interaction, action)
 
     async def execute_action(self, interaction: Interaction, action: dict):
-        # Implement the logic to handle different actions based on the action dict
-        # For example:
+        """Refactor to use functions outside of this function to simplify visibility"""
         if action["type"] == "send_message":
             await interaction.response.send_message(action["content"], ephemeral=True)
         elif action["type"] == "assign_role":
             role = interaction.guild.get_role(action["role_id"])
             if role:
-                await interaction.user.add_roles(role)
-                await interaction.response.send_message(f"You have been assigned the role {role.name}", ephemeral=True)
-        # Add more action types as needed
+                try:
+                    await interaction.user.add_roles(role)
+                    await interaction.response.send_message(
+                        f"You have been assigned the role {role.name}", ephemeral=True
+                    )
+                except nextcord.Forbidden:
+                    await interaction.response.send_message(
+                        "Sorry, I don't have permission to assign that role.", ephemeral=True
+                    )
+            else:
+                await interaction.response.send_message("Role not found.", ephemeral=True)
 
 
 
@@ -173,7 +181,7 @@ class UIFetcher:
 
 
 
-"""
+""" 
 Basic Embed Structure:
 async def name_embed(self, ctx):
         embed = Embed(
