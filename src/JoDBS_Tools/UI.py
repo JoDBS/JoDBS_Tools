@@ -106,95 +106,66 @@ class GeneralEmbeds:
         return embed
 
 
-class LoadEmbed:
-    def __init__(self, guild_id):
+class UIFetcher:
+    def __init__(self, bot, guild_id):
+        self.bot = bot
         self.guild_id = str(guild_id)
-        
-        # Example data structure
-        self.embeds = {
-            "1150069659404603516": {  # guild_id
-                "rules": {
-                    "embed": {
-                        "title": "Server Rules",
-                        "description": "Please follow these rules",
-                        "color": 0x36393F,
-                        "fields": [
-                            {"name": "Rule 1", "value": "Be respectful", "inline": False}
-                        ]
-                    },
-                    "components": {
-                        "type": "button",
-                        "items": [
-                            {
-                                "label": "Accept Rules",
-                                "style": ButtonStyle.green,
-                                "custom_id": "accept_rules"
-                            }
-                        ]
-                    }
-                },
-                "roles": {
-                    "embed": {
-                        "title": "Server Roles",
-                        "description": "Choose your roles below"
-                    },
-                    "components": {
-                        "type": "select",
-                        "items": [
-                            {
-                                "label": "Gaming",
-                                "value": "gaming_role",
-                                "description": "Access to gaming channels"
-                            }
-                        ]
-                    }
-                }
-            }
-        }
+        self.ui_elements = load_json("./data/ui_elements.json").get(self.guild_id, {})
+        self.register_interactions()
 
     async def return_embed(self, name: str):
-        try:
-            guild_data = self.embeds.get(self.guild_id, {})
-            embed_data = guild_data.get(name, {}).get("embed")
-            if not embed_data:
-                return None
-            return Embed.from_dict(embed_data)
-        except Exception as e:
-            print(f"Error loading embed: {e}")
+        embed_data = self.ui_elements.get(name, {}).get("embed")
+        if not embed_data:
             return None
+        return Embed.from_dict(embed_data)
 
     async def return_components(self, name: str) -> View:
-        try:
-            guild_data = self.embeds.get(self.guild_id, {})
-            component_data = guild_data.get(name, {}).get("components")
-            if not component_data:
-                return None
-
-            view = View(timeout=180)
-            
-            if component_data["type"] == "button":
-                for item in component_data["items"]:
-                    button = Button(
-                        label=item["label"],
-                        style=item["style"],
-                        custom_id=item.get("custom_id")
-                    )
-                    view.add_item(button)
-
-            elif component_data["type"] == "select":
-                options = [SelectOption(**item) for item in component_data["items"]]
-                select = Select(options=options, custom_id=f"{name}_select")
-                view.add_item(select)
-
-            return view
-
-        except Exception as e:
-            print(f"Error loading components: {e}")
+        component_data = self.ui_elements.get(name, {}).get("components")
+        if not component_data:
             return None
 
+        view = View(timeout=180)
 
+        if component_data["type"] == "button":
+            for item in component_data["items"]:
+                button = Button(
+                    label=item["label"],
+                    style=item["style"],
+                    custom_id=item.get("custom_id")
+                )
+                view.add_item(button)
 
+        elif component_data["type"] == "select":
+            options = [SelectOption(**item) for item in component_data["items"]]
+            select = Select(
+                placeholder=component_data.get("placeholder", "Choose an option"),
+                options=options,
+                custom_id=component_data.get("custom_id")
+            )
+            view.add_item(select)
 
+        return view
+
+    def register_interactions(self):
+        @self.bot.event
+        async def on_interaction(interaction: Interaction):
+            custom_id = interaction.data.get('custom_id')
+            if custom_id in self.ui_elements:
+                action = self.ui_elements[custom_id].get("action")
+                if action:
+                    await self.execute_action(interaction, action)
+
+    async def execute_action(self, interaction: Interaction, action: dict):
+        # Implement the logic to handle different actions based on the action dict
+        # For example:
+        if action["type"] == "send_message":
+            await interaction.response.send_message(action["content"], ephemeral=True)
+        elif action["type"] == "assign_role":
+            role = interaction.guild.get_role(action["role_id"])
+            if role:
+                await interaction.user.add_roles(role)
+                await interaction.response.send_message(f"You have been assigned the role {role.name}", ephemeral=True)
+        # Add more action types as needed
 
 
 
