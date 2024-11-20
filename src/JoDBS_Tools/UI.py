@@ -125,7 +125,8 @@ class UIFetcher:
         if not component_data:
             return None
 
-        view = View(timeout=180)
+        timeout = component_data["timeout"], 180
+        view = View(timeout=int(timeout))
 
         if component_data["type"] == "button":
             for item in component_data["items"]:
@@ -147,6 +148,11 @@ class UIFetcher:
 
         return view
 
+    async def return_modals(self):
+        pass
+        # TODO: # Structure to create new models with continuation.
+
+
     def register_interactions(self):
         @self.bot.event
         async def on_interaction(interaction: Interaction):
@@ -164,16 +170,25 @@ class UIFetcher:
             role = interaction.guild.get_role(action["role_id"])
             if role:
                 try:
-                    await interaction.user.add_roles(role)
-                    await interaction.response.send_message(
-                        f"You have been assigned the role {role.name}", ephemeral=True
-                    )
+                    # Check if user already has role, then remove it
+                    if role in interaction.user.roles:
+                        await interaction.user.remove_roles(role)
+                        await interaction.response.send_message(
+                            f"You have been removed from the role {role.name}", ephemeral=True
+                        )
+                    else:
+                        await interaction.user.add_roles(role)
+                        await interaction.response.send_message(
+                            f"You have been assigned the role {role.name}", ephemeral=True
+                        )
                 except nextcord.Forbidden:
                     await interaction.response.send_message(
                         "Sorry, I don't have permission to assign that role.", ephemeral=True
                     )
             else:
                 await interaction.response.send_message("Role not found.", ephemeral=True)
+        elif action["type"] == "0":
+            pass
 
 
 
