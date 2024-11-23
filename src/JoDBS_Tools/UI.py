@@ -118,8 +118,8 @@ class UIFetcher:
     def register_interactions(self):
         @self.bot.event
         async def on_interaction(interaction: Interaction):
-            # Only handle interactions that haven't been handled by component callbacks
-            if interaction.response.is_done():
+            # Let component callbacks handle their own interactions
+            if hasattr(interaction, "message"):
                 return
             
             custom_id = interaction.data.get('custom_id')
@@ -127,7 +127,7 @@ class UIFetcher:
                 return
 
             action = self.get_action_by_custom_id(custom_id)
-            if action:
+            if action and not interaction.response.is_done():
                 await self.execute_action(interaction, action)
 
     async def return_embeds(self, name: str):
@@ -195,17 +195,17 @@ class UIFetcher:
                     modal_id = item_data.get("modal_id")
 
                     async def button_callback(interaction: Interaction, mid=modal_id, cid=custom_id):
-                        # First check if there's a modal to show
+                        action = self.get_action_by_custom_id(cid)
+                        
+                        # If there's a modal, show it first
                         if mid:
                             modal_data = await self.return_modal_data(mid)
                             modal = await self.create_modal_from_data(modal_data, handler_class)
                             if modal:
                                 await interaction.response.send_modal(modal)
                                 return
-                        
-                        # If no modal, check for action
-                        action = self.get_action_by_custom_id(cid)
-                        if action:
+                        # Otherwise, execute the action if present
+                        elif action:
                             await self.execute_action(interaction, action)
 
                     button = Button(
@@ -247,14 +247,16 @@ class UIFetcher:
         return None
 
     async def execute_action(self, interaction: Interaction, action: dict):
-        """Refactor to use functions outside of this function to simplify visibility"""
+        """Execute an action if the interaction hasn't been responded to"""
+        if interaction.response.is_done():
+            return
+
         if action["type"] == "send_message":
             await interaction.response.send_message(action["content"], ephemeral=True)
         elif action["type"] == "assign_role":
             role = interaction.guild.get_role(action["role_id"])
             if role:
                 try:
-                    # Check if user already has role, then remove it
                     if role in interaction.user.roles:
                         await interaction.user.remove_roles(role)
                         await interaction.response.send_message(
