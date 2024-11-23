@@ -113,6 +113,19 @@ class UIFetcher:
         self.guild_id = str(guild_id)
         self.ui_elements = load_json("./data/ui_elements.json")
         self.guild_ui = self.ui_elements.get(self.guild_id, {})
+        self.register_interactions()
+
+    def register_interactions(self):
+        @self.bot.event
+        async def on_interaction(interaction: Interaction):
+            custom_id = interaction.data.get('custom_id')
+            if not custom_id:
+                return  # Ignore interactions without custom_id
+            action = self.get_action_by_custom_id(custom_id)
+            if action:
+                # Respond only if not already responded in callback
+                if not interaction.response.is_done():
+                    await self.execute_action(interaction, action)
 
     async def return_embeds(self, name: str):
         item = self.guild_ui.get(name, {})
@@ -139,14 +152,19 @@ class UIFetcher:
                         custom_id=custom_id
                     )
 
-                    async def button_callback(interaction: Interaction, custom_id=custom_id):
-                        action = self.get_action_by_custom_id(custom_id)
-                        if action:
-                            await self.execute_action(interaction, action)
-                        else:
-                            await interaction.response.send_message("No action found.", ephemeral=True)
+                    # Check if there's a modal associated with this button
+                    modal_name = item_data.get("modal_id")
+                    if modal_name:
+                        async def button_callback(interaction: Interaction, modal_name=modal_name):
+                            modals = await self.return_modals(modal_name)
+                            if modals:
+                                await interaction.response.send_modal(modals[0])
+                            else:
+                                await interaction.response.send_message("No modal found.", ephemeral=True)
 
-                    button.callback = button_callback
+                        button.callback = button_callback
+                    # Else, the action will be handled in on_interaction
+
                     view.add_item(button)
 
             elif component["type"] == "select":
@@ -192,7 +210,9 @@ class UIFetcher:
 
                 async def callback(self, interaction: Interaction):
                     # Handle modal submission
-                    await interaction.response.send_message("Modal submitted!", ephemeral=True)
+                    responses = {item.label: item.value for item in self.children}
+                    # Process the responses as needed
+                    await interaction.response.send_message("Thank you for your submission!", ephemeral=True)
 
             modals.append(CustomModal())
         return modals
