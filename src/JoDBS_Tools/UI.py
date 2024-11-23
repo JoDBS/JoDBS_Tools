@@ -118,14 +118,17 @@ class UIFetcher:
     def register_interactions(self):
         @self.bot.event
         async def on_interaction(interaction: Interaction):
+            # Only handle interactions that haven't been handled by component callbacks
+            if interaction.response.is_done():
+                return
+            
             custom_id = interaction.data.get('custom_id')
             if not custom_id:
-                return  # Ignore interactions without custom_id
+                return
+
             action = self.get_action_by_custom_id(custom_id)
             if action:
-                # Respond only if not already responded in callback
-                if not interaction.response.is_done():
-                    await self.execute_action(interaction, action)
+                await self.execute_action(interaction, action)
 
     async def return_embeds(self, name: str):
         item = self.guild_ui.get(name, {})
@@ -191,12 +194,19 @@ class UIFetcher:
                     custom_id = item_data.get("custom_id")
                     modal_id = item_data.get("modal_id")
 
-                    async def button_callback(interaction: Interaction, mid=modal_id):
+                    async def button_callback(interaction: Interaction, mid=modal_id, cid=custom_id):
+                        # First check if there's a modal to show
                         if mid:
                             modal_data = await self.return_modal_data(mid)
                             modal = await self.create_modal_from_data(modal_data, handler_class)
                             if modal:
                                 await interaction.response.send_modal(modal)
+                                return
+                        
+                        # If no modal, check for action
+                        action = self.get_action_by_custom_id(cid)
+                        if action:
+                            await self.execute_action(interaction, action)
 
                     button = Button(
                         label=item_data["label"],
