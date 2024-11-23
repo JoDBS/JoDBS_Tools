@@ -129,6 +129,24 @@ class UIFetcher:
         if not components_data:
             return None
 
+        if component["type"] == "button":
+            for item_data in component["items"]:
+                button = Button(
+                    label=item_data["label"],
+                    style=item_data["style"],
+                    custom_id=item_data.get("custom_id")
+                )
+
+                async def button_callback(interaction: Interaction):
+                    modals = await self.return_modals(name)
+                    if modals:
+                        await interaction.response.send_modal(modals[0])
+                    else:
+                        await interaction.response.send_message("No modal found.", ephemeral=True)
+
+                button.callback = button_callback
+                view.add_item(button)
+
         view = View(timeout=None)
         for component in components_data:
             if component["type"] == "button":
@@ -154,13 +172,37 @@ class UIFetcher:
         modals_data = item.get("modals", [])
         if not modals_data:
             return None
-        # Implement modal creation logic here
-        # ...existing code...
+        modals = []
+        for modal_data in modals_data:
+            class CustomModal(nextcord.ui.Modal):
+                def __init__(self):
+                    super().__init__(title=modal_data["title"], timeout=modal_data.get("timeout"))
+                    for item in modal_data["items"]:
+                        self.add_item(
+                            nextcord.ui.TextInput(
+                                label=item["label"],
+                                placeholder=item.get("placeholder"),
+                                required=item.get("required", True),
+                                min_length=item.get("min_length"),
+                                max_length=item.get("max_length"),
+                                default_value=item.get("default_value"),
+                                style=item.get("text_input_style", nextcord.TextInputStyle.short)
+                            )
+                        )
+
+                async def callback(self, interaction: Interaction):
+                    # Handle modal submission
+                    await interaction.response.send_message("Modal submitted!", ephemeral=True)
+
+            modals.append(CustomModal())
+        return modals
 
     def register_interactions(self):
         @self.bot.event
         async def on_interaction(interaction: Interaction):
             custom_id = interaction.data.get('custom_id')
+            if not custom_id:
+                return  # Ignore interactions without custom_id (e.g., slash commands)
             for item_name, item in self.guild_ui.items():
                 actions = item.get("actions", [])
                 for action in actions:
