@@ -1,6 +1,6 @@
 import nextcord
 from nextcord import Interaction, Member, Embed, Colour, ButtonStyle, SelectOption
-from nextcord.ui import View, Button, button, Select
+from nextcord.ui import View, Button, button, Select, Modal, TextInput
 from .utils import Get_Datetime_UTC, load_json, get_highest_role_without_color
 
 class ConfirmView(View):
@@ -107,6 +107,21 @@ class GeneralEmbeds:
         return embed
 
 
+class CustomModal(Modal):
+    def __init__(self, title: str, custom_id: str, items: list):
+        super().__init__(title=title, custom_id=custom_id)
+        for item in items:
+            text_input = TextInput(
+                label=item.get("label", ""),
+                placeholder=item.get("placeholder", ""),
+                custom_id=item.get("custom_id", ""),
+                required=item.get("required", True),
+                min_length=item.get("min_length", 1),
+                max_length=item.get("max_length", 4000),
+                style=item.get("style", 1)
+            )
+            self.add_item(text_input)
+
 class UIFetcher:
     def __init__(self, bot, guild_id):
         self.bot = bot
@@ -148,10 +163,25 @@ class UIFetcher:
 
         return view
 
-    async def return_modals(self):
-        pass
-        # TODO: # Structure to create new models with continuation.
+    async def return_modal(self, name: str) -> CustomModal:
+        modal_data = self.ui_elements.get(name, {}).get("modal")
+        if not modal_data:
+            return None
+        
+        modal = CustomModal(
+            title=modal_data.get("title", "Modal"),
+            custom_id=modal_data.get("custom_id", "generic_modal"),
+            items=modal_data.get("items", [])
+        )
+        return modal
 
+    async def return_modals(self):
+        modal_elements = {
+            name: data.get("modal")
+            for name, data in self.ui_elements.items()
+            if "modal" in data
+        }
+        return modal_elements
 
     def register_interactions(self):
         @self.bot.event
