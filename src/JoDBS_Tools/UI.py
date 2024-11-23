@@ -196,6 +196,9 @@ class UIFetcher:
                 def __init__(self):
                     super().__init__(title=modal_data["title"], timeout=modal_data.get("timeout"))
                     for item in modal_data["items"]:
+                        style_input = item.get("text_input_style", nextcord.TextInputStyle.short)
+                        if isinstance(style_input, int):
+                            style_input = nextcord.TextInputStyle(style_input)
                         self.add_item(
                             nextcord.ui.TextInput(
                                 label=item["label"],
@@ -204,7 +207,7 @@ class UIFetcher:
                                 min_length=item.get("min_length"),
                                 max_length=item.get("max_length"),
                                 default_value=item.get("default_value"),
-                                style=item.get("text_input_style", nextcord.TextInputStyle.short)
+                                style=style_input
                             )
                         )
 
