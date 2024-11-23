@@ -129,34 +129,27 @@ class UIFetcher:
         if not components_data:
             return None
 
-        if component["type"] == "button":
-            for item_data in component["items"]:
-                button = Button(
-                    label=item_data["label"],
-                    style=item_data["style"],
-                    custom_id=item_data.get("custom_id")
-                )
-
-                async def button_callback(interaction: Interaction):
-                    modals = await self.return_modals(name)
-                    if modals:
-                        await interaction.response.send_modal(modals[0])
-                    else:
-                        await interaction.response.send_message("No modal found.", ephemeral=True)
-
-                button.callback = button_callback
-                view.add_item(button)
-
         view = View(timeout=None)
         for component in components_data:
             if component["type"] == "button":
                 for item_data in component["items"]:
+                    custom_id = item_data.get("custom_id")
                     button = Button(
                         label=item_data["label"],
                         style=item_data["style"],
-                        custom_id=item_data.get("custom_id")
+                        custom_id=custom_id
                     )
+
+                    async def button_callback(interaction: Interaction, custom_id=custom_id):
+                        action = self.get_action_by_custom_id(custom_id)
+                        if action:
+                            await self.execute_action(interaction, action)
+                        else:
+                            await interaction.response.send_message("No action found.", ephemeral=True)
+
+                    button.callback = button_callback
                     view.add_item(button)
+
             elif component["type"] == "select":
                 options = [SelectOption(**opt) for opt in component["items"]]
                 select = Select(
@@ -166,6 +159,14 @@ class UIFetcher:
                 )
                 view.add_item(select)
         return view
+
+    def get_action_by_custom_id(self, custom_id):
+        for item in self.guild_ui.values():
+            actions = item.get("actions", [])
+            for action in actions:
+                if action.get("custom_id") == custom_id:
+                    return action
+        return None
 
     async def return_modals(self, name: str):
         item = self.guild_ui.get(name, {})
