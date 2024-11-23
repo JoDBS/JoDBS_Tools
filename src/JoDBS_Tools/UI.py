@@ -113,7 +113,6 @@ class UIFetcher:
         self.guild_id = str(guild_id)
         self.ui_elements = load_json("./data/ui_elements.json")
         self.guild_ui = self.ui_elements.get(self.guild_id, {})
-        self.register_interactions()
 
     async def return_embeds(self, name: str):
         item = self.guild_ui.get(name, {})
@@ -197,18 +196,6 @@ class UIFetcher:
 
             modals.append(CustomModal())
         return modals
-
-    def register_interactions(self):
-        @self.bot.event
-        async def on_interaction(interaction: Interaction):
-            custom_id = interaction.data.get('custom_id')
-            if not custom_id:
-                return  # Ignore interactions without custom_id (e.g., slash commands)
-            for item_name, item in self.guild_ui.items():
-                actions = item.get("actions", [])
-                for action in actions:
-                    if action.get("custom_id") == custom_id:
-                        await self.execute_action(interaction, action)
 
     async def execute_action(self, interaction: Interaction, action: dict):
         """Refactor to use functions outside of this function to simplify visibility"""
