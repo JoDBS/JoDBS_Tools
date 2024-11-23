@@ -1,5 +1,5 @@
 import nextcord
-from nextcord import Interaction, Member, Embed, Colour, ButtonStyle, SelectOption
+from nextcord import Interaction, Member, Embed, Colour, ButtonStyle, SelectOption, TextInputStyle
 from nextcord.ui import View, Button, button, Select, TextInput, Modal
 from .utils import Get_Datetime_UTC, load_json, get_highest_role_without_color
 
@@ -157,13 +157,15 @@ class UIFetcher:
                 self.handler = handler
                 for item in modal_data["items"]:
                     if item["type"] == "text_input":
+                        # Convert integer style to TextInputStyle enum
+                        style = TextInputStyle(item.get("text_input_style", 1))
                         self.add_item(TextInput(
                             label=item["label"],
                             placeholder=item.get("placeholder", ""),
                             required=item.get("required", True),
                             min_length=item.get("min_length"),
                             max_length=item.get("max_length"),
-                            style=item.get("text_input_style", 1)
+                            style=style
                         ))
 
             async def callback(self, interaction: Interaction):
@@ -261,10 +263,6 @@ class UIFetcher:
                 await interaction.response.send_message("Role not found.", ephemeral=True)
         elif action["type"] == "0":
             pass
-
-
-
-
 
 
 
