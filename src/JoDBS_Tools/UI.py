@@ -118,6 +118,10 @@ class UIFetcher:
     def register_interactions(self):
         @self.bot.event
         async def on_interaction(interaction: Interaction):
+            # Only handle non-modal interactions here
+            if interaction.type == nextcord.InteractionType.modal_submit:
+                return
+            
             # Let component callbacks handle their own interactions
             if hasattr(interaction, "message"):
                 return
@@ -146,7 +150,6 @@ class UIFetcher:
         return modals_data
 
     async def create_modal_from_data(self, modal_data, handler_class=None):
-        """Creates a modal instance from modal data with handler class for callbacks"""
         if not modal_data:
             return None
 
@@ -160,23 +163,23 @@ class UIFetcher:
                 self.handler = handler
                 for item in modal_data["items"]:
                     if item["type"] == "text_input":
-                        # Convert integer style to TextInputStyle enum
-                        style = TextInputStyle(item.get("text_input_style", 1))
                         self.add_item(TextInput(
                             label=item["label"],
+                            custom_id=item["label"],  # Add this line
                             placeholder=item.get("placeholder", ""),
                             required=item.get("required", True),
                             min_length=item.get("min_length"),
                             max_length=item.get("max_length"),
-                            style=style
+                            style=TextInputStyle(item.get("text_input_style", 1))
                         ))
 
             async def callback(self, interaction: Interaction):
-                values = {item.label: item.value for item in self.children}
                 if self.handler and hasattr(self.handler, f"handle_{self.custom_id}"):
-                    await getattr(self.handler, f"handle_{self.custom_id}")(interaction, values)
+                    handler_method = getattr(self.handler, f"handle_{self.custom_id}")
+                    values = {item.custom_id: item.value for item in self.children}
+                    await handler_method(interaction, values)
                 else:
-                    await interaction.response.send_message("Form submitted!", ephemeral=True)
+                    await interaction.response.send_message("No handler found for this modal!", ephemeral=True)
 
         return DynamicModal(modal_data[0], handler_class)
 
