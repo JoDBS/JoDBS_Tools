@@ -128,12 +128,23 @@ class PersistentView(View):
                 await self.handler_class.get_ui_fetcher(interaction.guild_id).execute_action(interaction, action)
 
 class ButtonView(PersistentView):
-    def __init__(self, handler_class, label, style, modal_id=None, custom_id=None):
+    def __init__(self, handler_class, button_data):
+        modal_id = button_data.get("modal_id")
+        custom_id = button_data.get("custom_id")
         super().__init__(handler_class, modal_id, custom_id)
-        self.add_item(Button(label=label, style=style, custom_id=custom_id or "button"))
+        
+        # Convert style from int to ButtonStyle enum
+        style = ButtonStyle(button_data.get("style", 1))
+        
+        button = Button(
+            label=button_data["label"],
+            style=style,
+            custom_id=custom_id or "button"
+        )
+        button.callback = self.button_callback
+        self.add_item(button)
 
-    @button(custom_id="button")
-    async def button_callback(self, button: Button, interaction: Interaction):
+    async def button_callback(self, interaction: Interaction):
         await self.handle_interaction(interaction)
 
 class UIFetcher:
@@ -225,17 +236,10 @@ class UIFetcher:
         for component in components_data:
             if component["type"] == "button":
                 for item_data in component["items"]:
-                    button_view = ButtonView(
-                        handler_class,
-                        label=item_data["label"],
-                        style=item_data["style"],
-                        modal_id=item_data.get("modal_id"),
-                        custom_id=item_data.get("custom_id")
-                    )
-                    # Store the view
+                    button_view = ButtonView(handler_class, item_data)
                     view_key = f"{name}_{item_data.get('custom_id')}"
                     self.active_views[view_key] = button_view
-                    view.add_item(button_view.children[0])  # Add the button from the view
+                    view.add_item(button_view.children[0])
 
             elif component["type"] == "select":
                 options = [SelectOption(**opt) for opt in component["items"]]
