@@ -141,3 +141,12 @@ class UIFetcher:
                 if action.get("custom_id") == custom_id:
                     return action
         return None
+    
+    async def return_embeds(self, name: str) -> Embed:
+        """Return an embed with a matching name"""
+        embeds_data = self.get_embeds_data(name)
+        embeds = []
+        for data in embeds_data:
+            embed = Embed.from_dict(data)
+            embeds.append(embed)
+        return embeds
