@@ -111,7 +111,11 @@ class UIFetcher:
     def __init__(self, bot, guild_id):
         self.bot = bot
         self.guild_id = str(guild_id)
-        self.ui_elements = load_json("./data/ui_elements.json")
+        try:
+            self.ui_elements = load_json("./data/ui_elements.json") or {}
+        except Exception as e:
+            print(f"Error loading UI elements: {e}")
+            self.ui_elements = {}
         self.guild_ui = self.ui_elements.get(self.guild_id, {})
 
     def get_item_data(self, name: str) -> dict:
@@ -142,11 +146,15 @@ class UIFetcher:
                     return action
         return None
     
-    async def return_embeds(self, name: str) -> Embed:
-        """Return an embed with a matching name"""
-        embeds_data = self.get_embeds_data(name)
-        embeds = []
-        for data in embeds_data:
-            embed = Embed.from_dict(data)
-            embeds.append(embed)
-        return embeds
+    async def return_embeds(self, name: str) -> list:
+        """Return a list of embeds with a matching name"""
+        try:
+            embeds_data = self.get_embeds_data(name)
+            embeds = []
+            for data in embeds_data:
+                embed = Embed.from_dict(data)
+                embeds.append(embed)
+            return embeds
+        except Exception as e:
+            print(f"Error creating embeds: {e}")
+            return []
