@@ -158,3 +158,26 @@ class UIFetcher:
         except Exception as e:
             print(f"Error creating embeds: {e}")
             return []
+
+    async def return_components(self, name: str) -> View:
+        """Return a View containing components with a matching name"""
+        try:
+            components_data = self.get_components_data(name)
+            if not components_data:
+                return None
+            
+            view = View(timeout=None)
+            for component in components_data:
+                if component["type"] == "button":
+                    button = Button(
+                        style=ButtonStyle(component.get("style", 1)),
+                        label=component.get("label", "Button"),
+                        custom_id=component.get("custom_id"),
+                        disabled=component.get("disabled", False)
+                    )
+                    view.add_item(button)
+                # Can be extended for other component types like Select menus
+            return view
+        except Exception as e:
+            print(f"Error creating components: {e}")
+            return None
