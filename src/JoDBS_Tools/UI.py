@@ -2,7 +2,9 @@ import nextcord
 from nextcord import Interaction, Member, Embed, Colour, ButtonStyle, SelectOption, TextInputStyle, File
 from nextcord.ui import View, Button, button, Select, TextInput, Modal
 from .utils import Get_Datetime_UTC, save_json, load_json, get_highest_role_without_color
-from io import StringIO
+from io import StringIO, BytesIO
+import json
+import zipfile
 
 class ConfirmView(View):
     def __init__(self, ctx: Interaction, amount: int):
@@ -75,8 +77,25 @@ class GeneralEmbeds:
         roles_data = {
             role.name: role.id for role in server_roles
         }
-        roles_json = StringIO(str(roles_data))
-        server_roles_file = File(fp=roles_json, filename=f"{server_name}_roles.json", description="Exported roles.json for Server")
+        
+        # Create zip file in memory
+        zip_buffer = BytesIO()
+        with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zip_file:
+            # Convert roles_data to JSON string
+            roles_json = json.dumps(roles_data, indent=4)
+            # Add JSON file to zip
+            zip_file.writestr(f"{server_name}_roles.json", roles_json)
+        
+        # Reset buffer position
+        zip_buffer.seek(0)
+        
+        # Create File object with zip
+        server_roles_file = File(
+            fp=zip_buffer, 
+            filename=f"{server_name}_roles.zip",
+            description="Exported roles.json for Server (ZIP)"
+        )
+        
         return [embed, server_roles_file]
     
     async def user_info_embed(self, ctx, member):
