@@ -2,6 +2,7 @@ import nextcord
 from nextcord import Interaction, Member, Embed, Colour, ButtonStyle, SelectOption, TextInputStyle, File
 from nextcord.ui import View, Button, button, Select, TextInput, Modal
 from .utils import Get_Datetime_UTC, save_json, load_json, get_highest_role_without_color
+from io import StringIO
 
 class ConfirmView(View):
     def __init__(self, ctx: Interaction, amount: int):
@@ -71,7 +72,11 @@ class GeneralEmbeds:
         embed.add_field(name="Roles", value=f"{server_roles} Roles", inline=False)
         embed.add_field(name="BNC Roles.json", value=self.roles.get(str(server_id), "No Roles.json Data"), inline=False)
         
-        server_roles_file = File(fp=server_roles, filename=f"{server_name}_roles.json")
+        roles_data = {
+            role.name: role.id for role in server_roles
+        }
+        roles_json = StringIO(str(roles_data))
+        server_roles_file = File(fp=roles_json, filename=f"{server_name}_roles.json")
         return [embed, server_roles_file]
     
     async def user_info_embed(self, ctx, member):
