@@ -78,13 +78,18 @@ class GeneralEmbeds:
             role.name: role.id for role in server_roles
         }
         
+        bnc_roles_data = self.roles.get(str(server_id), {})
+        
         # Create zip file in memory
         zip_buffer = BytesIO()
         with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zip_file:
-            # Convert roles_data to JSON string
+            # Add current server roles
             roles_json = json.dumps(roles_data, indent=4)
-            # Add JSON file to zip
-            zip_file.writestr(f"{server_name}_roles.json", roles_json)
+            zip_file.writestr(f"{server_name}_current_roles.json", roles_json)
+            
+            # Add BNC roles data
+            bnc_roles_json = json.dumps(bnc_roles_data, indent=4)
+            zip_file.writestr(f"{server_name}_bnc_roles.json", bnc_roles_json)
         
         # Reset buffer position
         zip_buffer.seek(0)
