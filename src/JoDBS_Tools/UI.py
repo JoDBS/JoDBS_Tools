@@ -44,6 +44,7 @@ class GeneralEmbeds:
         return embed
     
     async def server_info_embed(self, ctx):
+        """Create embed with containing server information, index[0] = embed, index [1] includes roles.json for server"""
         server = ctx.guild
         server_id = server.id
         server_name = server.name
@@ -52,6 +53,7 @@ class GeneralEmbeds:
         server_member_count = server.member_count
         server_online_members = len([member for member in server.members if member.status != "offline"])
         server_icon = server.icon
+        server_roles = server.roles
 
         embed = Embed(
             title=f"Server Information for {server_name} ({server_id})",
@@ -66,10 +68,10 @@ class GeneralEmbeds:
         embed.add_field(name="Categories", value=f"{len(server.categories)} Categories")
         embed.add_field(name="Member Count", value=f"{server_member_count} Members")
         embed.add_field(name="Online Members", value=f"{server_online_members} Members")
-        embed.add_field(name="Roles", value=f"{server.roles} Roles", inline=False)
+        embed.add_field(name="Roles", value=f"{server_roles} Roles", inline=False)
         embed.add_field(name="BNC Roles.json", value=self.roles.get(str(server_id), "No Roles.json Data"), inline=False)
         
-        return embed
+        return [embed, server_roles]
     
     async def user_info_embed(self, ctx, member):
         # add docstring
