@@ -76,7 +76,7 @@ class GeneralEmbeds:
             role.name: role.id for role in server_roles
         }
         roles_json = StringIO(str(roles_data))
-        server_roles_file = File(fp=roles_json, filename=f"{server_name}_roles.json")
+        server_roles_file = File(fp=roles_json, filename=f"{server_name}_roles.json", description="Exported roles.json for Server")
         return [embed, server_roles_file]
     
     async def user_info_embed(self, ctx, member):
