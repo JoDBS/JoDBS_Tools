@@ -85,7 +85,7 @@ class GeneralEmbeds:
         with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zip_file:
             # Add current server roles
             roles_json = json.dumps(roles_data, indent=4)
-            zip_file.writestr(f"{server_name}_current_roles.json", roles_json)
+            zip_file.writestr(f"{server_name}_server_roles.json", roles_json)
             
             # Add BNC roles data
             bnc_roles_json = json.dumps(bnc_roles_data, indent=4)
@@ -97,7 +97,7 @@ class GeneralEmbeds:
         # Create File object with zip
         server_roles_file = File(
             fp=zip_buffer, 
-            filename=f"{server_name}_roles.zip",
+            filename=f"{server_name}_data.zip",
             description="Exported roles.json for Server (ZIP)"
         )
         
