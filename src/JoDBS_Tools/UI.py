@@ -5,6 +5,7 @@ from .utils import Get_Datetime_UTC, save_json, load_json, get_highest_role_with
 from io import StringIO, BytesIO
 import json
 import zipfile
+from typing import Optional, Callable, Dict, Any
 
 class ConfirmView(View):
     def __init__(self, ctx: Interaction, amount: int):
@@ -139,10 +140,58 @@ class GeneralEmbeds:
         return embed
     
     
+class ActionHandler:
+    def __init__(self, bot):
+        self.bot = bot
+        self.action_callbacks: Dict[str, Callable] = {}
+
+    def get_namespaced_id(self, guild_id: str, custom_id: str) -> str:
+        """Create a namespaced custom_id that includes the guild_id"""
+        return f"{guild_id}:{custom_id}"
+
+    async def handle_interaction(self, interaction: Interaction):
+        """Handle incoming interactions and route to appropriate callbacks"""
+        custom_id = interaction.data.get('custom_id')
+        guild_id = str(interaction.guild_id)
+        namespaced_id = self.get_namespaced_id(guild_id, custom_id)
+        
+        if namespaced_id in self.action_callbacks:
+            await self.action_callbacks[namespaced_id](interaction)
+
+    async def default_message_response(self, interaction: Interaction, message: str):
+        """Default handler for message responses"""
+        try:
+            await interaction.response.send_message(message, ephemeral=True)
+        except Exception as e:
+            print(f"Error sending message response: {e}")
+
+    async def default_role_action(self, interaction: Interaction, role_id: int, remove: bool = False):
+        """Default handler for role assignments"""
+        try:
+            member = interaction.user
+            role = interaction.guild.get_role(role_id)
+            if role:
+                if remove:
+                    await member.remove_roles(role)
+                else:
+                    await member.add_roles(role)
+                await interaction.response.send_message(
+                    f"Role {'removed' if remove else 'added'} successfully!", 
+                    ephemeral=True
+                )
+        except Exception as e:
+            print(f"Error handling role action: {e}")
+
+    def register_action(self, guild_id: str, custom_id: str, callback: Callable):
+        """Register a custom action callback with guild namespace"""
+        namespaced_id = self.get_namespaced_id(guild_id, custom_id)
+        self.action_callbacks[namespaced_id] = callback
+
 class UIFetcher:
     def __init__(self, bot, guild_id):
         self.bot = bot
         self.guild_id = str(guild_id)
+        self.action_handler = ActionHandler(bot)
         try:
             self.ui_elements = load_json("./data/ui_elements.json") or {}
         except Exception as e:
@@ -191,7 +240,42 @@ class UIFetcher:
             print(f"Error creating embeds: {e}")
             return []
 
-    async def return_components(self, name: str) -> View:
+    async def register_component_actions(self, name: str):
+        """Register actions for components"""
+        item = self.get_item_data(name)
+        actions = item.get("actions", [])
+        
+        for action in actions:
+            custom_id = action.get("custom_id")
+            action_type = action.get("type")
+            
+            if action_type == "message":
+                message = action.get("message", "Button clicked!")
+                self.action_handler.register_action(
+                    self.guild_id,
+                    custom_id,
+                    lambda i, m=message: self.action_handler.default_message_response(i, m)
+                )
+            
+            elif action_type == "add_role":
+                role_id = action.get("role_id")
+                if role_id:
+                    self.action_handler.register_action(
+                        self.guild_id,
+                        custom_id,
+                        lambda i, r=role_id: self.action_handler.default_role_action(i, r)
+                    )
+            
+            elif action_type == "remove_role":
+                role_id = action.get("role_id")
+                if role_id:
+                    self.action_handler.register_action(
+                        self.guild_id,
+                        custom_id,
+                        lambda i, r=role_id: self.action_handler.default_role_action(i, r, remove=True)
+                    )
+
+    async def return_components(self, name: str) -> Optional[View]:
         """Return a View containing components with a matching name"""
         try:
             components_data = self.get_components_data(name)
@@ -199,16 +283,22 @@ class UIFetcher:
                 return None
             
             view = View(timeout=None)
+            
+            # Register actions before creating buttons
+            await self.register_component_actions(name)
+            
             for component in components_data:
                 if component["type"] == "button":
+                    custom_id = component.get("custom_id")
                     button = Button(
                         style=ButtonStyle(component.get("style", 1)),
                         label=component.get("label", "Button"),
-                        custom_id=component.get("custom_id"),
+                        custom_id=custom_id,
                         disabled=component.get("disabled", False)
                     )
+                    # Add interaction callback
+                    button.callback = self.action_handler.handle_interaction
                     view.add_item(button)
-                # Can be extended for other component types like Select menus
             return view
         except Exception as e:
             print(f"Error creating components: {e}")
