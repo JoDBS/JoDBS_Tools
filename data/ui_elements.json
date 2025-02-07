@@ -1,0 +1,30 @@
+{
+    "123456789": {
+        "welcome_message": {
+            "id": "welcome_001",
+            "persistent": true,
+            "embeds": [
+                {
+                    "title": "Welcome",
+                    "description": "Welcome to our server!",
+                    "color": 3447003
+                }
+            ],
+            "components": [
+                {
+                    "type": "button",
+                    "custom_id": "accept_rules",
+                    "label": "Accept Rules",
+                    "style": 1
+                }
+            ],
+            "actions": [
+                {
+                    "custom_id": "accept_rules",
+                    "type": "add_role",
+                    "role_id": "123456789"
+                }
+            ]
+        }
+    }
+}

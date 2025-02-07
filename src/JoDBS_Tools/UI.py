@@ -6,6 +6,8 @@ from io import StringIO, BytesIO
 import json
 import zipfile
 from typing import Optional, Callable, Dict, Any
+from pathlib import Path
+import logging
 
 class ConfirmView(View):
     def __init__(self, ctx: Interaction, amount: int):
@@ -187,17 +189,92 @@ class ActionHandler:
         namespaced_id = self.get_namespaced_id(guild_id, custom_id)
         self.action_callbacks[namespaced_id] = callback
 
+class UIElement:
+    def __init__(self, element_id: str, persistent: bool = False):
+        self.element_id = element_id
+        self.persistent = persistent
+        self.components = []
+        self.embeds = []
+
+class UIManager:
+    def __init__(self, config_path: Path):
+        self.config_path = config_path
+        self.elements: Dict[str, UIElement] = {}
+        self.load_config()
+
+    def load_config(self):
+        if not self.config_path.exists():
+            return
+        
+        with open(self.config_path, 'r') as f:
+            config = json.load(f)
+            for element_id, data in config.items():
+                element = UIElement(
+                    element_id=element_id,
+                    persistent=data.get('persistent', False)
+                )
+                self.elements[element_id] = element
+
+class ComponentBuilder:
+    @staticmethod
+    def create_button(data: dict) -> ui.Button:
+        return ui.Button(
+            custom_id=data['custom_id'],
+            label=data.get('label', ''),
+            style=data.get('style', 1)
+        )
+
+class ActionRegistry:
+    def __init__(self):
+        self.actions: Dict[str, callable] = {}
+
+    def register(self, custom_id: str, callback: callable):
+        self.actions[custom_id] = callback
+
+    async def execute(self, custom_id: str, interaction):
+        if custom_id in self.actions:
+            await self.actions[custom_id](interaction)
+
+class UIView(ui.View):
+    def __init__(self, element: UIElement, action_registry: ActionRegistry):
+        super().__init__(timeout=None if element.persistent else 180)
+        self.element = element
+        self.action_registry = action_registry
+
+    async def interaction_check(self, interaction) -> bool:
+        custom_id = interaction.data.get('custom_id')
+        if custom_id:
+            await self.action_registry.execute(custom_id, interaction)
+        return True
+
 class UIFetcher:
     def __init__(self, bot, guild_id):
         self.bot = bot
         self.guild_id = str(guild_id)
         self.action_handler = ActionHandler(bot)
+        self.persistent_views = {}
+        self.logger = logging.getLogger('JoDBS_Tools.UI')
+        self.load_ui_elements()
+
+    def load_ui_elements(self):
         try:
             self.ui_elements = load_json("./data/ui_elements.json") or {}
+            self.guild_ui = self.ui_elements.get(self.guild_id, {})
+            # Load persistent views
+            for name, data in self.guild_ui.items():
+                if data.get("persistent", False):
+                    self.load_persistent_view(name, data)
         except Exception as e:
-            print(f"Error loading UI elements: {e}")
+            self.logger.error(f"Error loading UI elements: {e}", exc_info=True)
             self.ui_elements = {}
-        self.guild_ui = self.ui_elements.get(self.guild_id, {})
+            self.guild_ui = {}
+
+    def load_persistent_view(self, name: str, data: dict):
+        view = await self.return_components(name)
+        if view:
+            view.message_id = data.get("id")
+            self.bot.add_view(view)
+            self.persistent_views[data["id"]] = view
 
     def get_item_data(self, name: str) -> dict:
         """Get all data for a specific UI item"""
@@ -257,7 +334,7 @@ class UIFetcher:
                     lambda i, m=message: self.action_handler.default_message_response(i, m)
                 )
             
-            elif action_type == "add_role":
+            elif action_type == "add_role": 
                 role_id = action.get("role_id")
                 if role_id:
                     self.action_handler.register_action(
