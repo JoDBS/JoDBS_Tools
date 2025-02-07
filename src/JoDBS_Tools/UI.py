@@ -1,5 +1,5 @@
 import nextcord
-from nextcord import Interaction, Member, Embed, Colour, ButtonStyle, SelectOption, TextInputStyle, File
+from nextcord import Interaction, Member, Embed, Colour, ButtonStyle, SelectOption, TextInputStyle, File, ui
 from nextcord.ui import View, Button, button, Select, TextInput, Modal
 from .utils import Get_Datetime_UTC, save_json, load_json, get_highest_role_without_color
 from io import StringIO, BytesIO
@@ -217,8 +217,8 @@ class UIManager:
 
 class ComponentBuilder:
     @staticmethod
-    def create_button(data: dict) -> ui.Button:
-        return ui.Button(
+    def create_button(data: dict) -> Button:  # Changed from ui.Button to Button since we import it directly
+        return Button(
             custom_id=data['custom_id'],
             label=data.get('label', ''),
             style=data.get('style', 1)
