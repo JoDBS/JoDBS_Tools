@@ -260,21 +260,31 @@ class UIFetcher:
         try:
             self.ui_elements = load_json("./data/ui_elements.json") or {}
             self.guild_ui = self.ui_elements.get(self.guild_id, {})
-            # Load persistent views
-            for name, data in self.guild_ui.items():
-                if data.get("persistent", False):
-                    self.load_persistent_view(name, data)
+            # Load persistent views handled separately to avoid async issues
         except Exception as e:
             self.logger.error(f"Error loading UI elements: {e}", exc_info=True)
             self.ui_elements = {}
             self.guild_ui = {}
 
-    def load_persistent_view(self, name: str, data: dict):
-        view = await self.return_components(name)
-        if view:
-            view.message_id = data.get("id")
-            self.bot.add_view(view)
-            self.persistent_views[data["id"]] = view
+    async def load_persistent_views(self):
+        """Asynchronously load all persistent views"""
+        try:
+            for name, data in self.guild_ui.items():
+                if data.get("persistent", False):
+                    await self.load_persistent_view(name, data)
+        except Exception as e:
+            self.logger.error(f"Error loading persistent views: {e}", exc_info=True)
+
+    async def load_persistent_view(self, name: str, data: dict):
+        """Asynchronously load a single persistent view"""
+        try:
+            view = await self.return_components(name)
+            if view:
+                view.message_id = data.get("id")
+                self.bot.add_view(view)
+                self.persistent_views[data["id"]] = view
+        except Exception as e:
+            self.logger.error(f"Error loading persistent view {name}: {e}", exc_info=True)
 
     def get_item_data(self, name: str) -> dict:
         """Get all data for a specific UI item"""
