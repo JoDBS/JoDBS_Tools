@@ -10,8 +10,16 @@ class UIManager:
         """Load UI data from a JSON file."""
         try:
             if file_path is None:
-                file_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'data', 'ui_data.json')
+                # Get the directory where bot.py is located
+                bot_root = os.path.dirname(os.path.abspath(self.bot.file_path))
+                file_path = os.path.join(bot_root, 'data', 'ui_data.json')
             
+            print(f"Loading UI data from: {file_path}")  # Debug print
+            
+            if not os.path.exists(file_path):
+                print(f"UI data file not found at: {file_path}")
+                return False
+                
             with open(file_path, 'r') as f:
                 self.ui_data = json.load(f)
             return True
@@ -19,8 +27,4 @@ class UIManager:
             print(f"Error loading UI data: {e}")
             return False
 
-    def get_ui_data(self, guild_id=None):
-        """Get UI data for a specific guild or all UI data if no guild_id is provided."""
-        if guild_id:
-            return self.ui_data.get(str(guild_id))
-        return self.ui_data
+    # ...existing code...
