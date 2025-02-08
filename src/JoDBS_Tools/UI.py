@@ -260,7 +260,6 @@ class UIFetcher:
         try:
             self.ui_elements = load_json("./data/ui_elements.json") or {}
             self.guild_ui = self.ui_elements.get(self.guild_id, {})
-            # Load persistent views handled separately to avoid async issues
         except Exception as e:
             self.logger.error(f"Error loading UI elements: {e}", exc_info=True)
             self.ui_elements = {}
@@ -278,13 +277,79 @@ class UIFetcher:
     async def load_persistent_view(self, name: str, data: dict):
         """Asynchronously load a single persistent view"""
         try:
-            view = await self.return_components(name)
+            view = await self.create_view(name)
             if view:
                 view.message_id = data.get("id")
                 self.bot.add_view(view)
                 self.persistent_views[data["id"]] = view
         except Exception as e:
             self.logger.error(f"Error loading persistent view {name}: {e}", exc_info=True)
+
+    async def create_embeds(self, name: str) -> list:
+        """Create embeds from configuration"""
+        try:
+            embeds_data = self.get_embeds_data(name)
+            embeds = []
+            for data in embeds_data:
+                embed = Embed.from_dict(data)
+                embeds.append(embed)
+            return embeds
+        except Exception as e:
+            self.logger.error(f"Error creating embeds: {e}", exc_info=True)
+            return []
+
+    async def create_view(self, name: str) -> Optional[View]:
+        """Create a view with components from configuration"""
+        try:
+            components_data = self.get_components_data(name)
+            if not components_data:
+                return None
+
+            view = View(timeout=None)
+            await self.register_component_actions(name)
+
+            for component in components_data:
+                if component["type"] == "button":
+                    button = Button(
+                        style=ButtonStyle(component.get("style", 1)),
+                        label=component.get("label", "Button"),
+                        custom_id=component.get("custom_id"),
+                        disabled=component.get("disabled", False)
+                    )
+                    button.callback = self.action_handler.handle_interaction
+                    view.add_item(button)
+
+            return view
+        except Exception as e:
+            self.logger.error(f"Error creating view: {e}", exc_info=True)
+            return None
+
+    def get_embeds_data(self, name: str) -> list:
+        """Get embed data for a specific UI element"""
+        item = self.guild_ui.get(name, {})
+        return item.get("embeds", [])
+
+    def get_components_data(self, name: str) -> list:
+        """Get component data for a specific UI element"""
+        item = self.guild_ui.get(name, {})
+        return item.get("components", [])
+
+    async def send_ui_message(self, interaction: Interaction, name: str):
+        """Send a message with configured UI elements"""
+        try:
+            embeds = await self.create_embeds(name)
+            view = await self.create_view(name)
+            
+            await interaction.response.send_message(
+                embeds=embeds,
+                view=view
+            )
+        except Exception as e:
+            self.logger.error(f"Error sending UI message: {e}", exc_info=True)
+            await interaction.response.send_message(
+                "Error creating UI message",
+                ephemeral=True
+            )
 
     def get_item_data(self, name: str) -> dict:
         """Get all data for a specific UI item"""

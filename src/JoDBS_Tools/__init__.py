@@ -5,7 +5,7 @@ from .Decorators import Permission_Checks, Cooldown_Checks
 from .utils import Load_ENV, Get_ENV, Get_ENV_Bool, Get_Datetime_UTC, Get_UnixTimestamp_UTC, Get_UnixTime_UTC, save_json, load_json, get_highest_role_without_color
 from .BotSetup import BotSetup
 from .YouTube import YouTube
-from .UI import GeneralEmbeds, ConfirmView
+from .UI import GeneralEmbeds, ConfirmView, UIFetcher
 
 __all__ = [
     # Database
@@ -33,5 +33,6 @@ __all__ = [
     
     # UI
     'GeneralEmbeds',
-    'ConfirmView'
+    'ConfirmView',
+    'UIFetcher'
 ]
