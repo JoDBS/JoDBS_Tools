@@ -38,6 +38,8 @@ class CustomUI:
     
     async def create_view(self, components: List[Dict], actions: List[Dict]) -> View:
         """Create a View with components and their associated actions"""
+        outer_self = self  # Store reference to outer class
+        
         class DynamicView(View):
             def __init__(self, components: List[Dict], actions: List[Dict]):
                 super().__init__(timeout=None)
@@ -45,7 +47,7 @@ class CustomUI:
                 
                 for component in components:
                     if component['type'] == 'button':
-                        button = self.create_button(component)
+                        button = outer_self.create_button(component)  # Use outer class method
                         self.add_item(button)
             
             async def button_callback(self, interaction: Interaction):
@@ -67,7 +69,7 @@ class CustomUI:
             return None
             
         result = {
-            'id': element['id'],
+            'id': f"{guild_id}_{element_name}",  # Generate ID from guild_id and element_name
             'persistent': element.get('persistent', False),
             'embeds': [],
             'view': None
