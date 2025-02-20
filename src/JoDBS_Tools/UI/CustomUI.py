@@ -49,14 +49,27 @@ class CustomUI:
                 
                 for component in components:
                     if component['type'] == 'button':
-                        button = outer_self.create_button(component)  # Use outer class method
+                        button = outer_self.create_button(component)
                         button.callback = self.button_callback
                         self.add_item(button)
             
             async def button_callback(self, interaction: Interaction):
-                action = self.actions.get(interaction.custom_id)
-                if action:
-                    await outer_self.action_handler.handle_action(interaction, action)
+                try:
+                    custom_id = interaction.data.get('custom_id')
+                    action = self.actions.get(custom_id)
+                    if action:
+                        await outer_self.action_handler.handle_action(interaction, action)
+                    else:
+                        await interaction.response.send_message(
+                            "No action found for this button.",
+                            ephemeral=True
+                        )
+                except Exception as e:
+                    print(f"Error in button callback: {e}")
+                    await interaction.response.send_message(
+                        "An error occurred while processing your request.",
+                        ephemeral=True
+                    )
         
         return DynamicView(components, actions)
     
