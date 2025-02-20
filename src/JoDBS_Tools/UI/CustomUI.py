@@ -13,6 +13,7 @@ class CustomUI:
             3: ButtonStyle.success,
             4: ButtonStyle.danger
         }
+        self.action_handler = ActionHandler(bot)
         
     def get_ui_element(self, guild_id: str, element_name: str) -> Optional[Dict]:
         """Retrieve a UI element configuration for a specific guild"""
@@ -48,17 +49,13 @@ class CustomUI:
                 for component in components:
                     if component['type'] == 'button':
                         button = outer_self.create_button(component)  # Use outer class method
+                        button.callback = self.button_callback
                         self.add_item(button)
             
             async def button_callback(self, interaction: Interaction):
                 action = self.actions.get(interaction.custom_id)
-                if action and action['type'] == 'add_role':
-                    role = interaction.guild.get_role(int(action['role_id']))
-                    if role:
-                        await interaction.user.add_roles(role)
-                        await interaction.response.send_message(
-                            f"Role {role.name} added!", ephemeral=True
-                        )
+                if action:
+                    await outer_self.action_handler.handle_action(interaction, action)
         
         return DynamicView(components, actions)
     
@@ -87,3 +84,33 @@ class CustomUI:
             )
             
         return result
+
+    async def send_ui_element(self, channel, guild_id: str, element_name: str):
+        """Send a UI element to a channel and register it if persistent"""
+        element = await self.load_ui_element(guild_id, element_name)
+        if not element:
+            return None
+
+        message = await channel.send(
+            embeds=element['embeds'],
+            view=element['view']
+        )
+
+        if element.get('persistent', False):
+            await self.action_handler.register_message(message, element['id'])
+
+        return message
+
+    async def reload_persistent_messages(self):
+        """Reload all persistent messages"""
+        for message_id, data in self.action_handler.persistent_messages.items():
+            try:
+                channel = self.bot.get_channel(int(data['channel_id']))
+                if channel:
+                    message = await channel.fetch_message(int(message_id))
+                    guild_id, element_name = data['ui_element_id'].split('_', 1)
+                    element = await self.load_ui_element(guild_id, element_name)
+                    if element:
+                        await message.edit(embeds=element['embeds'], view=element['view'])
+            except Exception as e:
+                print(f"Failed to reload message {message_id}: {e}")
