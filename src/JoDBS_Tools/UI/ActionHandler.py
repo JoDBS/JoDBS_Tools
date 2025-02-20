@@ -54,11 +54,15 @@ class ActionHandler:
         # Future implementation for modal handling
         pass
 
-    async def register_message(self, message: Message, ui_element_id: str):
+    async def register_message(self, message: Message, ui_element_id: str, element_data: Dict):
         """Register a message for persistence"""
         self.persistent_messages[str(message.id)] = {
             'channel_id': str(message.channel.id),
             'guild_id': str(message.guild.id),
-            'ui_element_id': ui_element_id
+            'ui_element_id': ui_element_id,
+            'element_name': element_data.get('name'),
+            'timestamp': str(message.created_at),
+            'author_id': str(message.author.id)
         }
         self._save_persistent_messages()
+        print(f"Registered persistent message: {message.id} for element: {ui_element_id}")
