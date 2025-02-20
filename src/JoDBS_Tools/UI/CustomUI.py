@@ -80,10 +80,12 @@ class CustomUI:
             return None
             
         result = {
-            'id': f"{guild_id}_{element_name}",  # Generate ID from guild_id and element_name
-            'persistent': element.get('persistent', False),
+            'id': f"{guild_id}_{element_name}",
+            'name': element_name,
+            'persistent': element.get('persistent', True),  # Default to True for persistence
             'embeds': [],
-            'view': None
+            'view': None,
+            'config': element  # Store original config for reference
         }
         
         # Create embeds
@@ -105,15 +107,27 @@ class CustomUI:
         if not element:
             return None
 
-        message = await channel.send(
-            embeds=element['embeds'],
-            view=element['view']
-        )
+        try:
+            message = await channel.send(
+                embeds=element['embeds'],
+                view=element['view']
+            )
 
-        if element.get('persistent', False):
-            await self.action_handler.register_message(message, element['id'])
+            # Always register for persistence unless explicitly set to false
+            if element.get('persistent', True):
+                await self.action_handler.register_message(
+                    message=message,
+                    ui_element_id=element['id'],
+                    element_data={
+                        'name': element['name'],
+                        'config': element['config']
+                    }
+                )
 
-        return message
+            return message
+        except Exception as e:
+            print(f"Error sending UI element: {e}")
+            return None
 
     async def reload_persistent_messages(self):
         """Reload all persistent messages"""
