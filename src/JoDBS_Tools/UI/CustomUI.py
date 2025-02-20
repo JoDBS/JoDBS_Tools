@@ -2,6 +2,7 @@ from nextcord import Embed, ButtonStyle, Interaction
 from nextcord.ui import View, Button
 from ..utils import load_json
 from typing import Dict, List, Optional, Union
+from .ActionHandler import ActionHandler
 
 class CustomUI:
     def __init__(self, bot):

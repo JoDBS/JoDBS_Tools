@@ -3,6 +3,7 @@
 # UI Packages
 from .GeneralEmbeds import GeneralEmbeds
 from .CustomUI import CustomUI
+from .ActionHandler import ActionHandler
 
 # Singular Elements
 from .ConfirmView import ConfirmView
@@ -12,6 +13,7 @@ __all__ = [
     # UI Packages
     'GeneralEmbeds',
     'CustomUI',
+    'ActionHandler',
 
     # Singular Elements
     'ConfirmView',
