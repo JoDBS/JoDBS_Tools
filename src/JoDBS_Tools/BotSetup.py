@@ -6,6 +6,7 @@ from .utils import Get_ENV, Load_ENV, Get_ENV_Bool
 
 class BotSetup:
     def __init__(self, bot, env_path=None, NodeConnection=True):
+        self.start_time = int(datetime.timestamp(datetime.now()))
         self.bot = bot
         Load_ENV(env_path)  # Ensure environment variables are loaded before accessing them
         self.NodeConnection = Get_ENV_Bool("NODE_CONNECTION", NodeConnection)
@@ -83,7 +84,10 @@ class BotSetup:
             launch_time = str(datetime.now())[0:19]
             user = self.bot.user
 
-            launch_message = f"Launched with Version {version} at {launch_time}"+ "\n" + f"Logged in as: {user}" + "\n" + "\n" + "\n"
+            end_time = int(datetime.timestamp(datetime.now()))
+            elapsed_time = end_time - self.start_time
+            launch_message = f"Launched with Version {version} at {launch_time}"+ "\n" + f"Logged in as: {user}" + "\n" +f"Elapsed time: {elapsed_time}" + "\n" + "\n"
+            
             return launch_message
         except:
             return "Failed to get Bot Startup Info."
