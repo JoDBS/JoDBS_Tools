@@ -8,6 +8,11 @@ class BotSetup:
     def __init__(self, bot, env_path=None, NodeConnection=True):
         self.start_time = datetime.timestamp(datetime.now())
         self.bot = bot
+
+        # If no env_path is provided, look for .env in the current working directory
+        if env_path is None:
+            env_path = os.path.join(os.getcwd(), '.env')
+            
         Load_ENV(env_path)  # Ensure environment variables are loaded before accessing them
         self.NodeConnection = Get_ENV_Bool("NODE_CONNECTION", default=NodeConnection)
         self.token = Get_ENV(key="TOKEN")

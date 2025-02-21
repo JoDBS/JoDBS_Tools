@@ -145,3 +145,12 @@ def load_json(file_path=None):
         raise FileNotFoundError(f"File '{file_path}' not found.")
     with open(file_path, 'r') as json_file:
         return json.load(json_file)
+    
+
+def Intents_ALL():
+    """
+    Get all intents.
+    """
+    from nextcord import Intents
+    intents = Intents.all()
+    return intents
