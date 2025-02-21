@@ -23,22 +23,25 @@ def Load_ENV(env_path=None):
     else:
         load_dotenv()
 
-def Get_ENV(key):
+def Get_ENV(key, default=None):
     """
     Retrieve the value of an environment variable.
 
     Args:
         key (str): The name of the environment variable to retrieve.
+        default (str, optional): The default value to return if the environment variable is not found. Defaults to None.
 
     Returns:
         str: The value of the environment variable.
 
     Raises:
-        KeyError: If the environment variable is not found.
+        KeyError: If the environment variable is not found and no default is provided.
     """
     try:
         return os.environ[key]
     except KeyError:
+        if default is not None:
+            return default
         raise KeyError(f"Environment variable '{key}' not found.")
 
 def Get_ENV_Bool(key, default=None):
@@ -53,14 +56,18 @@ def Get_ENV_Bool(key, default=None):
         bool: The value of the environment variable as a boolean.
 
     Raises:
-        KeyError: If the environment variable is not found
+        KeyError: If the environment variable is not found and no default is provided.
     """
     try:
-        value = Get_ENV(key)
-        if value is None:
-            return default
-        return str(value).lower() == "true"
+        value = Get_ENV(key, default)
+        if isinstance(value, bool):
+            return value
+        if isinstance(value, str):
+            return value.lower() in ('true', '1', 'yes')
+        return bool(value)
     except KeyError:
+        if default is not None:
+            return default
         raise KeyError(f"Environment variable '{key}' not found.")
 
 def Get_Datetime_UTC():

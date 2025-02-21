@@ -9,7 +9,7 @@ class BotSetup:
         self.start_time = datetime.timestamp(datetime.now())
         self.bot = bot
         Load_ENV(env_path)  # Ensure environment variables are loaded before accessing them
-        self.NodeConnection = Get_ENV_Bool("NODE_CONNECTION", NodeConnection)
+        self.NodeConnection = Get_ENV_Bool("NODE_CONNECTION", default=NodeConnection)
         self.token = Get_ENV(key="TOKEN")
         self.cogs_directory = "./cogs"
         self.BNC = BotNetworkConnection() if self.NodeConnection else None 
