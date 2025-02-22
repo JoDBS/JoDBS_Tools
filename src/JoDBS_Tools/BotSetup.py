@@ -72,7 +72,7 @@ class BotSetup:
             print("=====BOT=====")
             print("Loading Cogs:")
             self.add_cogs()
-            print("==================================================")
+            print("=======================DONE=======================")
             self.run_bot()
         except Exception as e:
             print(f"ERROR: bot.py | Bot Setup failed to run; BotNetworkConnection failed, or cogs failed to run. Check ENV variables.")
@@ -81,8 +81,8 @@ class BotSetup:
         try:
             # Initiate a BotNetworkConnection to get version.
             if self.NodeConnection:
-                BNC = BotNetworkConnection(base_url=Get_ENV("BNC_BASE_URL"), api_key=Get_ENV("BNC_API_KEY"))
-                version = BNC.get_data(scope="version")
+                # BNC = BotNetworkConnection(base_url=Get_ENV("BNC_BASE_URL"), api_key=Get_ENV("BNC_API_KEY"))
+                version = self.BNC.get_data(scope="version")
             else:
                 version = "N/A"
 
@@ -101,8 +101,8 @@ class BotSetup:
         try:
             if self.NodeConnection:
                 # Initiate a BotNetworkConnection to get version.
-                BNC = BotNetworkConnection(base_url=Get_ENV("BNC_BASE_URL"), api_key=Get_ENV("BNC_API_KEY"))
-                version = BNC.get_data(scope="version")
+                # BNC = BotNetworkConnection(base_url=Get_ENV("BNC_BASE_URL"), api_key=Get_ENV("BNC_API_KEY"))
+                version = self.BNC.get_data(scope="version")
                 if version is None:
                     return False
                 activity_name = f"with v{version}"
