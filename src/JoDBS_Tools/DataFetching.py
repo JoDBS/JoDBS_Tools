@@ -9,10 +9,9 @@ class DataFetching:
         try:
             os.makedirs("data")
             print("> DataFetching.py: Created data folder.")
+            return
         except FileExistsError:
             return
-        else:
-            print("> DataFetching.py: Problem whilst creating data folder.")
 
 
     def get_all_available():
