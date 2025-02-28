@@ -2,6 +2,7 @@ import os
 from datetime import datetime
 from nextcord import Game
 from .Database import BotNetworkConnection
+from .DataFetching import DataFetching
 from .utils import Get_ENV, Load_ENV, Get_ENV_Bool
 
 class BotSetup:
@@ -58,15 +59,20 @@ class BotSetup:
                     print("Bot Setup failed to run;\n BotNetworkConnection failed. Check ENV variables.")
                     return
                 print(status)
+
+                # Fetch data from BNC
+                data_fetching = DataFetching()
                 
-                # Check if bot can get roles.json from BotNetwork
-                print("Retrieving Roles from BotNetwork:")
-                roles_fetch = self.BNC.fetch_and_save_roles()
-                if roles_fetch:
-                    print("Roles fetched successfully.")
-                else:
-                    print("Roles fetch failed. (some cogs might error out if they rely on roles.json)")
-                    print("Update roles.json in BotNetwork.")
+
+
+                # # Check if bot can get roles.json from BotNetwork
+                # print("Retrieving Roles from BotNetwork:")
+                # roles_fetch = self.BNC.fetch_and_save_roles()
+                # if roles_fetch:
+                #     print("Roles fetched successfully.")
+                # else:
+                #     print("Roles fetch failed. (some cogs might error out if they rely on roles.json)")
+                #     print("Update roles.json in BotNetwork.")
             else:
                 print("BotNetworkConnection is disabled.\n Some features might not work if cogs rely on BNC functions.")
             print("=====BOT=====")
