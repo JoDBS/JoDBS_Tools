@@ -68,17 +68,17 @@ class BotNetworkConnection:
             "x-api-key": self.token,
             "Content-Type": "application/json"
         }
-        self.roles_file = './data/roles.json'
-        self.fetch_and_save_roles()
+    #     self.roles_file = './data/roles.json'
+    #     self.fetch_and_save_roles()
 
-    # Roles
-    def fetch_and_save_roles(self):
-        try:
-            roles = self.get_data(scope="roles")
-            save_json(roles, self.roles_file)
-            return True
-        except:
-            return None
+    # # Roles
+    # def fetch_and_save_roles(self):
+    #     try:
+    #         roles = self.get_data(scope="roles")
+    #         save_json(roles, self.roles_file)
+    #         return True
+    #     except:
+    #         return None
 
     def get_data(self, scope="full"):
         try:
