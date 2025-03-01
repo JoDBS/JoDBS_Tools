@@ -111,7 +111,8 @@ class BotNetworkConnection:
                 case "version":
                     return data.get('data', {}).get('version')
                 case _:
-                    return data.get('data', {})
+                    return False
+                    # return data.get('data', {})
                 
         except Exception as e:
             print(f"BotNetworkConnection: {e}")

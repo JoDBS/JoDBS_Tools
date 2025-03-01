@@ -19,7 +19,7 @@ class DataFetching:
     def __create_data_folder(self):
         try:
             os.makedirs(self.data_folder)
-            print("> DataFetching.py: Created data folder.")
+            print(f"> {self.file_name}: Created data folder.")
             return
         except FileExistsError:
             return
