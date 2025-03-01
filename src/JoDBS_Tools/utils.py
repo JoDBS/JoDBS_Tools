@@ -136,7 +136,7 @@ def load_json(file_path=None):
         raise ValueError("File path is empty.")
     if not os.path.exists(file_path):
         # raise FileNotFoundError(f"File '{file_path}' not found.")
-        return None # Returning False so init statements can use alternative option.
+        return False # Returning False so init statements can use alternative option.
     with open(file_path, 'r') as json_file:
         return json.load(json_file)
     

@@ -19,8 +19,8 @@ class BotSetup:
         self.NodeConnection = Get_ENV_Bool("NODE_CONNECTION", default=NodeConnection)
         self.token = Get_ENV(key="TOKEN")
         self.cogs_directory = "./cogs"
-        self.BNC = BotNetworkConnection() if self.NodeConnection else None 
-        self.version = load_json("./data/version.json")["version"] or "N/A"
+        self.BNC = BotNetworkConnection() if self.NodeConnection else None
+        self.version = "N/A"
 
     def run_bot(self):
         try:
@@ -67,6 +67,8 @@ class BotSetup:
                 data_fetching = DataFetching(debug=self.debug)
                 print("Fetching Data:")
                 data_fetching.get_all_available_scopes()
+                version_data = load_json("./data/version.json")
+                self.version = version_data.get("version", "N/A")
 
             else:
                 print("BotNetworkConnection is disabled.\n Some features might not work if cogs rely on BNC functions.")
