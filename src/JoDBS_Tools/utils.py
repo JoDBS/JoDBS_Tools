@@ -108,22 +108,15 @@ def Get_UnixTime_UTC():
 
 # JSON Save & Load Functions
 
-def save_json(data, file_path=None):
-    """
-    Save a dictionary or JSON object to a file.
-
-    Parameters:
-    data (dict): The data to be saved. Must be a dictionary or JSON object.
-    file_path (str): The path to the file where the data will be saved. Default is None.
-
-    Raises:
-    ValueError: If data or file_path is empty.
-    """
-    if not data or not file_path:
-        raise ValueError("Data or file path is empty.")
-    os.makedirs(os.path.dirname(file_path), exist_ok=True)
-    with open(file_path, 'w') as json_file:
-        json.dump(data, json_file, indent=4)
+def save_json(data, file_path):
+    if not file_path:
+        raise ValueError("File path is empty.")
+    
+    try:
+        with open(file_path, 'w') as f:
+            json.dump(data if data is not None else {}, f, indent=4)
+    except Exception as e:
+        raise IOError(f"Failed to save JSON: {e}")
 
 def load_json(file_path=None):
     """
