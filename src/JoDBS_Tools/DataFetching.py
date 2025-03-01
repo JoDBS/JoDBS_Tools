@@ -26,6 +26,7 @@ class DataFetching:
 
 
     def get_by_scope(self, scope: str):
+        file_path = f"{self.data_folder}/{scope}.json"
         try:
             data = self.BNC.get_data(scope=scope)
 
@@ -35,18 +36,17 @@ class DataFetching:
             
             if data:
                 data_json = {scope: data}
-                save_json(data_json, f"{self.data_folder}/{scope}.json")
+                save_json(data_json, file_path)
                 print(f"> {self.file_name}: Successfully fetched {scope} from BotNetworkConnection.")
+            else:
+                # If no data received, create empty file
+                save_json({}, file_path)
+                print(f"> {self.file_name}: No data received, created empty file for {scope}")
                 
         except Exception as e:
-            print(f"> {self.file_name}: Failed to fetch {scope} from BotNetworkConnection.")
-            # print(f"> {self.file_name}: Error: {e}")
-            # Create an empty file as fallback
-            try:
-                file_path = f"{self.data_folder}/{scope}.json"
-                save_json({}, file_path)
-            except Exception as save_error:
-                print(f"> {self.file_name}: Failed to create fallback file: {save_error}")
+            print(f"> {self.file_name}: Failed to fetch {scope} from BotNetworkConnection: {e}")
+            save_json({}, file_path)
+            print(f"> {self.file_name}: Created empty fallback file for {scope}")
 
     def get_all_available_scopes(self):
 

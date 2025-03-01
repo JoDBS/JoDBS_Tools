@@ -102,18 +102,20 @@ class BotNetworkConnection:
             
             url = f"{self.base_url}/data/{self.application_id}"
             response = requests.get(url, headers=self.headers)
+            data = self._handle_response(response)
+            
+            if data is None:
+                return None
 
             match scope:
                 case "version":
-                    data = self._handle_response(response)
                     return data.get('data', {}).get('version')
                 case _:
-                    return {""}
+                    return data.get('data', {})
                 
         except Exception as e:
             print(f"BotNetworkConnection: {e}")
             return None
-            
 
     # def create_data(self, data):
     #     url = f"{self.base_url}/data"
