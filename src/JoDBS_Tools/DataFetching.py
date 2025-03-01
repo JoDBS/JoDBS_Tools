@@ -45,9 +45,15 @@ class DataFetching:
                 save_json(data_json, f"{self.data_folder}/{scope}.json")
                 
         except Exception as e:
-            save_json({}, f"{self.data_folder}/{scope}.json")
             print(f"> {self.file_name}: Failed to fetch {scope} from BotNetworkConnection.")
             print(f"> {self.file_name}: Error: {e}")
+            # Create an empty file as fallback
+            try:
+                file_path = f"{self.data_folder}/{scope}.json"
+                save_json({scope: {}}, file_path)
+            except Exception as save_error:
+                print(f"> {self.file_name}: Failed to create fallback file: {save_error}")
+
 
     def get_all_available_scopes(self):
 
