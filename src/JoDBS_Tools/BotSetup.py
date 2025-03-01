@@ -66,7 +66,7 @@ class BotSetup:
                 # Fetch data from BNC
                 data_fetching = DataFetching(debug=self.debug)
                 print("Fetching Data:")
-                data_fetching.get_all_available_scopes()      
+                data_fetching.get_all_available_scopes()
 
             else:
                 print("BotNetworkConnection is disabled.\n Some features might not work if cogs rely on BNC functions.")
@@ -103,7 +103,7 @@ class BotSetup:
             activity_name = f"with v{self.version}"
             activity = Game(name=activity_name)
             await self.bot.change_presence(activity=activity)
-            
+
             return True
         except:
             print("Failed to set Bot Status.")
