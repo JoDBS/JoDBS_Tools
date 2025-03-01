@@ -45,6 +45,7 @@ class DataFetching:
                 save_json(data_json, f"{self.data_folder}/{scope}.json")
                 
         except Exception as e:
+            save_json({}, f"{self.data_folder}/{scope}.json")
             print(f"> {self.file_name}: Failed to fetch {scope} from BotNetworkConnection.")
             print(f"> {self.file_name}: Error: {e}")
 
