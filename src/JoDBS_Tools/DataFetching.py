@@ -33,7 +33,6 @@ class DataFetching:
 
     def get_by_scope(self, scope: str):
         try:
-            scope = "version"
             data = self.BNC.get_data(scope=scope)
 
             if self.debug:
