@@ -110,6 +110,8 @@ class BotNetworkConnection:
             match scope:
                 case "version":
                     return data.get('data', {}).get('version')
+                case "roles":
+                    return data.get('data', {}).get('roles')
                 case _:
                     return False
                 
