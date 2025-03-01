@@ -44,7 +44,7 @@ class DataFetching:
             # Create an empty file as fallback
             try:
                 file_path = f"{self.data_folder}/{scope}.json"
-                save_json({scope: ""}, file_path)
+                save_json({}, file_path)
             except Exception as save_error:
                 print(f"> {self.file_name}: Failed to create fallback file: {save_error}")
 
