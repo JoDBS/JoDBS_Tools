@@ -1,11 +1,17 @@
 import os
 from .Database import BotNetworkConnection
-from .utils import save_json, load_json
+from .utils import save_json, load_json, Load_ENV, Get_ENV, Get_ENV_Bool
 
 class DataFetching:
     def __init__(self, debug=False):
         self.debug = debug
+        self.file_name = os.path.basename(__file__)
         self.data_folder = "./data"
+        
+        # Convert comma-separated string from env var to a list
+        default_scopes_str = Get_ENV("DEFAULT_SCOPES")
+        self.default_scopes = default_scopes_str.split(",") if default_scopes_str else []
+        
         self.__create_data_folder()
         self.BNC = BotNetworkConnection()
 
@@ -25,34 +31,37 @@ class DataFetching:
     #     else:
     #         print(f"> DataFetching.py: Failed to fetch roles.json from BotNetworkConnection.")
 
-    def get_version(self):
+    def get_by_scope(self, scope: str):
         try:
             scope = "version"
             data = self.BNC.get_data(scope=scope)
 
             if self.debug:
-                print(f"> {__file__}: Getting version from BotNetworkConnection")
-                print(f"> {__file__}: Data: {data}")
+                print(f"> {self.file_name}: Getting {scope} from BotNetworkConnection")
+                print(f"> {self.file_name}: Data: {data}")
             
             if data:
-                print(f"> {__file__}: Successfully fetched version from BotNetworkConnection.")
-                save_json(data, f"{self.data_folder}/{scope}.json")
+                print(f"> {self.file_name}: Successfully fetched {scope} from BotNetworkConnection.")
+                data_json = {scope: data}
+                save_json(data_json, f"{self.data_folder}/{scope}.json")
                 
         except Exception as e:
-            print(f"> {__file__}: Failed to fetch version from BotNetworkConnection.")
-            print(f"> {__file__}: Error: {e}")
+            print(f"> {self.file_name}: Failed to fetch {scope} from BotNetworkConnection.")
+            print(f"> {self.file_name}: Error: {e}")
+
+    def get_all_available_scopes(self):
+
+        for scope in self.default_scopes:
+            self.get_by_scope(scope=scope)
 
 
-
-
-    def get_all_available(self):
 
         # Attempting to get all available data from BotNetworkConnection using scope full.
-        scope = "full"
-        print(f"> DataFetching.py: Attempting to get all available data from BotNetworkConnection using scope '{scope}'.")
-        data = self.BNC.get_data(scope=scope)
-        if data:
-            print(f"> DataFetching.py: Successfully fetched data from BotNetworkConnection.")
-            save_json(data, "data/all_data.json")
-        else:
-            print(f"> DataFetching.py: Failed to fetch data from BotNetworkConnection.")
+        # scope = "full"
+        # print(f"> DataFetching.py: Attempting to get all available data from BotNetworkConnection using scope '{scope}'.")
+        # data = self.BNC.get_data(scope=scope)
+        # if data:
+        #     print(f"> DataFetching.py: Successfully fetched data from BotNetworkConnection.")
+        #     save_json(data, "data/all_data.json")
+        # else:
+        #     print(f"> DataFetching.py: Failed to fetch data from BotNetworkConnection.")
