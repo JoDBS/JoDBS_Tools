@@ -41,7 +41,7 @@ class DataFetching:
             else:
                 # If no data received, create empty file
                 save_json({}, file_path)
-                print(f"> {self.file_name}: No data received, created empty file for {scope}")
+                print(f"> {self.file_name}: No data in {scope}, created empty file for {scope}")
                 
         except Exception as e:
             print(f"> {self.file_name}: Failed to fetch {scope} from BotNetworkConnection: {e}")

@@ -95,7 +95,7 @@ class BotNetworkConnection:
             print(f"BotNetworkConnection: Failed ❌ - {err}")
             raise Exception("BotNetworkConnection: Failed ❌")
 
-    def get_data(self, scope="full"):
+    def get_data(self, scope="none"):
         try:
             if self.application_id is None:
                 raise ValueError("BotNetworkConnection: Application ID is required.")
@@ -105,18 +105,18 @@ class BotNetworkConnection:
             data = self._handle_response(response)
             
             if data is None:
-                return None
-
+                raise Exception("BotNetworkConnection: Failed to fetch data.")
+                
             match scope:
                 case "version":
                     return data.get('data', {}).get('version')
                 case _:
                     return False
-                    # return data.get('data', {})
                 
         except Exception as e:
             print(f"BotNetworkConnection: {e}")
             return None
+            
 
     # def create_data(self, data):
     #     url = f"{self.base_url}/data"
