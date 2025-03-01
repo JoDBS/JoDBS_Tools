@@ -6,8 +6,9 @@ from .DataFetching import DataFetching
 from .utils import Get_ENV, Load_ENV, Get_ENV_Bool
 
 class BotSetup:
-    def __init__(self, bot, env_path=None, NodeConnection=True):
+    def __init__(self, bot, debug=False, env_path=None, NodeConnection=True):
         self.start_time = datetime.timestamp(datetime.now())
+        self.debug = debug
         self.bot = bot
 
         # If no env_path is provided, look for .env in the current working directory
@@ -81,7 +82,13 @@ class BotSetup:
             print("=======================DONE=======================")
             self.run_bot()
         except Exception as e:
-            print(f"ERROR: bot.py | Bot Setup failed to run; BotNetworkConnection failed, or cogs failed to run. Check ENV variables.")
+            # print(f"ERROR: bot.py | Bot Setup failed to run; BotNetworkConnection failed, or cogs failed to run. Check ENV variables.")
+            if not self.debug:
+                print(f"Bot Setup failed to run, enable debug for more info.")
+            
+            print(f"Bot Setup failed to run; BotNetworkConnection failed, or cogs failed to run. Check ENV variables.")
+            print(f"Error: {e}")
+
     
     async def getBotStartupInfo(self):
         try:
