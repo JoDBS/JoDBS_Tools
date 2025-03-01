@@ -68,8 +68,6 @@ class BotNetworkConnection:
             "x-api-key": self.token,
             "Content-Type": "application/json"
         }
-        # self.roles_file = './data/roles.json'
-    #     self.fetch_and_save_roles()
 
 
     def _handle_response(self, response):
@@ -97,17 +95,6 @@ class BotNetworkConnection:
             print(f"BotNetworkConnection: Failed ❌ - {err}")
             raise Exception("BotNetworkConnection: Failed ❌")
 
-
-    
-    # Roles
-    # def fetch_and_save_roles(self):
-    #     try:
-    #         roles = self.get_data(scope="roles")
-    #         save_json(roles, self.roles_file)
-    #         return True
-    #     except:
-    #         return None
-
     def get_data(self, scope="full"):
         try:
             if self.application_id is None:
@@ -126,29 +113,7 @@ class BotNetworkConnection:
         except Exception as e:
             print(f"BotNetworkConnection: {e}")
             return None
-                
-
-
-        #     if scope == "full":
-        #         return self._handle_response(response)
-        #     elif scope == "version":
-        #         data = self._handle_response(response)
-        #         return data.get('data', {}).get('version')
-        #     elif scope == "startup_info":
-        #         data = self._handle_response(response)
-        #         return data.get('data', {}).get('startup_info')
-        #     elif scope == "roles":
-        #         data = self._handle_response(response)
-        #         return data.get('data', {}).get('roles')
-        #     else:
-        #         try:
-        #             data = self._handle_response(response)
-        #             return data.get('data', {}).get(scope)
-        #         except:
-        #             print("BotNetworkConnection: Invalid scope provided.")
-        #             return None
-        # except:
-        #     return None
+            
 
     # def create_data(self, data):
     #     url = f"{self.base_url}/data"
