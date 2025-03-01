@@ -68,68 +68,20 @@ class BotNetworkConnection:
             "x-api-key": self.token,
             "Content-Type": "application/json"
         }
-        self.roles_file = './data/roles.json'
+        # self.roles_file = './data/roles.json'
     #     self.fetch_and_save_roles()
 
-    # Roles
-    def fetch_and_save_roles(self):
-        try:
-            roles = self.get_data(scope="roles")
-            save_json(roles, self.roles_file)
-            return True
-        except:
-            return None
 
-    def get_data(self, scope="full"):
+    def _handle_response(self, response):
         try:
-            if self.application_id is None:
-                raise ValueError("BotNetworkConnection: Application ID is required.")
-            
-            url = f"{self.base_url}/data/{self.application_id}"
-            response = requests.get(url, headers=self.headers)
-
-            if scope == "full":
-                return self._handle_response(response)
-            elif scope == "version":
-                data = self._handle_response(response)
-                return data.get('data', {}).get('version')
-            elif scope == "startup_info":
-                data = self._handle_response(response)
-                return data.get('data', {}).get('startup_info')
-            elif scope == "roles":
-                data = self._handle_response(response)
-                return data.get('data', {}).get('roles')
+            if response.status_code in [200, 201]:
+                return response.json()
             else:
-                try:
-                    data = self._handle_response(response)
-                    return data.get('data', {}).get(scope)
-                except:
-                    print("BotNetworkConnection: Invalid scope provided.")
-                    return None
-        except:
+                response.raise_for_status()
+        except Exception as e:
+            print(f"Error handling response: {e}")
             return None
-
-    def create_data(self, data):
-        url = f"{self.base_url}/data"
-        payload = {
-            "applicationId": self.application_id,
-            "data": data
-        }
-        response = requests.post(url, headers=self.headers, json=payload)
-        return self._handle_response(response)
-
-    def update_data(self, data):
-        url = f"{self.base_url}/data/{self.application_id}"
-        payload = {
-            "data": data
-        }
-        response = requests.put(url, headers=self.headers, json=payload)
-        return self._handle_response(response)
-
-    def delete_data(self):
-        url = f"{self.base_url}/data/{self.application_id}"
-        response = requests.delete(url, headers=self.headers)
-        return self._handle_response(response)
+        
 
     def check_status(self):
         url = f"{self.base_url}/status"
@@ -145,12 +97,77 @@ class BotNetworkConnection:
             print(f"BotNetworkConnection: Failed ❌ - {err}")
             raise Exception("BotNetworkConnection: Failed ❌")
 
-    def _handle_response(self, response):
+
+    
+    # Roles
+    # def fetch_and_save_roles(self):
+    #     try:
+    #         roles = self.get_data(scope="roles")
+    #         save_json(roles, self.roles_file)
+    #         return True
+    #     except:
+    #         return None
+
+    def get_data(self, scope="full"):
         try:
-            if response.status_code in [200, 201]:
-                return response.json()
-            else:
-                response.raise_for_status()
+            if self.application_id is None:
+                raise ValueError("BotNetworkConnection: Application ID is required.")
+            
+            url = f"{self.base_url}/data/{self.application_id}"
+            response = requests.get(url, headers=self.headers)
+
+            match scope:
+                case "version":
+                    data = self._handle_response(response)
+                    return data.get('data', {}).get('version')
+                case _:
+                    return {""}
+                
         except Exception as e:
-            print(f"Error handling response: {e}")
+            print(f"BotNetworkConnection: {e}")
             return None
+                
+
+
+        #     if scope == "full":
+        #         return self._handle_response(response)
+        #     elif scope == "version":
+        #         data = self._handle_response(response)
+        #         return data.get('data', {}).get('version')
+        #     elif scope == "startup_info":
+        #         data = self._handle_response(response)
+        #         return data.get('data', {}).get('startup_info')
+        #     elif scope == "roles":
+        #         data = self._handle_response(response)
+        #         return data.get('data', {}).get('roles')
+        #     else:
+        #         try:
+        #             data = self._handle_response(response)
+        #             return data.get('data', {}).get(scope)
+        #         except:
+        #             print("BotNetworkConnection: Invalid scope provided.")
+        #             return None
+        # except:
+        #     return None
+
+    # def create_data(self, data):
+    #     url = f"{self.base_url}/data"
+    #     payload = {
+    #         "applicationId": self.application_id,
+    #         "data": data
+    #     }
+    #     response = requests.post(url, headers=self.headers, json=payload)
+    #     return self._handle_response(response)
+
+    # def update_data(self, data):
+    #     url = f"{self.base_url}/data/{self.application_id}"
+    #     payload = {
+    #         "data": data
+    #     }
+    #     response = requests.put(url, headers=self.headers, json=payload)
+    #     return self._handle_response(response)
+
+    # def delete_data(self):
+    #     url = f"{self.base_url}/data/{self.application_id}"
+    #     response = requests.delete(url, headers=self.headers)
+    #     return self._handle_response(response)
