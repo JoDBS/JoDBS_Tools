@@ -22,6 +22,12 @@ class BotSetup:
         self.BNC = BotNetworkConnection() if self.NodeConnection else None
         self.version = "N/A"
 
+        # Debug logs
+        if self.debug:
+            print("BotSetup: Debug Mode Enabled")
+            print(f"BotSetup: NodeConnection: {self.NodeConnection}")
+            print(f"BotSetup: BNC: {self.BNC}")
+
     def run_bot(self):
         try:
             if not self.token or self.token == "NO_TOKEN_ADDED":
