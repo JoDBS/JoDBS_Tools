@@ -89,7 +89,7 @@ class BotNetworkConnection:
             print("BotNetworkConnection: ✔️")
             return response.json()
         except requests.exceptions.ConnectionError:
-            print("BotNetworkConnection: Failed ❌ - Please check if the BotNetworkConnection server is running.")
+            print("BotNetworkConnection: Connection Error ❌ - Please check if the BotNetworkConnection server is running.")
             return None
         except requests.exceptions.HTTPError as err:
             print(f"BotNetworkConnection: Failed ❌ - {err}")
