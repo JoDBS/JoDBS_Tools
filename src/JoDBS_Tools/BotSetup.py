@@ -85,6 +85,7 @@ class BotSetup:
             self.add_cogs()
             print("=======================DONE=======================")
             self.run_bot()
+            print(self.getBotStartupInfo())
         except Exception as e:
             # print(f"ERROR: bot.py | Bot Setup failed to run; BotNetworkConnection failed, or cogs failed to run. Check ENV variables.")
             if not self.debug:
@@ -93,7 +94,7 @@ class BotSetup:
             print(f"Bot Setup failed to run; BotNetworkConnection failed, or cogs failed to run. Check ENV variables.")
             print(f"Error: {e}")
 
-    async def getBotStartupInfo(self):
+    def getBotStartupInfo(self):
         try:
             launch_time = str(datetime.now())[0:19]
             user = self.bot.user
