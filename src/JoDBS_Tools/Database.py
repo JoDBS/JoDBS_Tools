@@ -82,7 +82,7 @@ class BotNetworkConnection:
         
 
     def check_status(self):
-        url = f"{self.base_url}/status"
+        url = f"{self.base_url}/api/status"
         try:
             response = requests.get(url, headers=self.headers)
             response.raise_for_status()
@@ -100,7 +100,7 @@ class BotNetworkConnection:
             if self.application_id is None:
                 raise ValueError("BotNetworkConnection: Application ID is required.")
             
-            url = f"{self.base_url}/data/{self.application_id}"
+            url = f"{self.base_url}/api/bots/data/{self.application_id}"
             response = requests.get(url, headers=self.headers)
             data = self._handle_response(response)
             
